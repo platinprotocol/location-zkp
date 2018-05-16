@@ -2,10 +2,28 @@
 \usepackage{amsmath,amssymb,url}
 \usepackage[unicode]{hyperref}
 
+
+\author{Vadym Fedyukovych\\
+  \small{
+       \url{https://platin.io/}
+%       vadym at platin.io
+  }
+}
+\title{Private location verification with incentivization\\
+  \small{in-progress}
+}
+
+
 \begin{document}
+\maketitle
+\abstract{
+  We design an interactive proof system
+  for ``location is close enough'' statement,
+  in the form of specification for further implementation.
+}
 
 \section{Definitions}
-Node proves the statement "distance is within a threshold" (less or equal),
+Node proves the statement "distance is within a threshold" (less or equal)
 for node coordinates $(x_n, y_n, z_n)$,
 given location $(x_l, y_l, z_l)$,
 and some threshold $d$ (all integers):
@@ -19,15 +37,15 @@ Proofs for integer relations are possible in hidden group order setup (Camenisch
 \section{Proof setup}
 
 Let $g$ be a generator of a proper group of a hidden order,
-and $h$ be a group element.
+and $h$ be a group element (Pedersen commitment scheme).
 We use multiplicative group of invertible residue classes modulo a composite $n$ such that
-$n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes.
+$n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes (Idemix).
 
 \section{Signals harvesting}
-Node creates commitment $(s_x, s_y, s_z)$ to coordinates:
+Node picks random $(r_x, r_y, r_z)$, creates commitment $(s_x, s_y, s_z)$ to it's coordinates
 \begin{gather}
-  s_x = g^{x_n} h^{r_x},  \;
-  s_y = g^{y_n} h^{r_y},  \;
+  s_x = g^{x_n} h^{r_x},   \qquad
+  s_y = g^{y_n} h^{r_y},   \qquad
   s_z = g^{z_n} h^{r_z}
 \end{gather}
 and keeps coordinates-randoms pairs
@@ -45,9 +63,10 @@ Private information is node location and randomness to commitment.
   and computes initial commitments $b_0, b_1, t_x, t_y, t_z$ \\
   ($f_0$ and $f_1$ explained at Background section)
 \begin{gather}
-  b_0 = g^{f_0} h^{\rho_0}, \; b_1 = g^{f_1} h^{\rho_1}  \\
-  t_x = g^{\beta_x} h^{\eta_x},  \;
-  t_y = g^{\beta_y} h^{\eta_y},  \;
+  b_0 = g^{f_0} h^{\rho_0},   \qquad
+  b_1 = g^{f_1} h^{\rho_1}    \\
+  t_x = g^{\beta_x} h^{\eta_x},   \qquad
+  t_y = g^{\beta_y} h^{\eta_y},   \qquad
   t_z = g^{\beta_z} h^{\eta_z}
 \end{gather}
 
@@ -57,24 +76,25 @@ Private information is node location and randomness to commitment.
   Prover computes responses
 \begin{gather}
 %  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) =
-  X_n = c x_n + \beta_x, \;
-  Y_n = c y_n + \beta_y, \;
-  Z_n = c z_n + \beta_z  \\
-  R_x = c r_x + \eta_x, \;
-  R_y = c r_y + \eta_y, \;
-  R_z = c r_z + \eta_z  \\
+  X_n = c x_n + \beta_x,  \quad
+  Y_n = c y_n + \beta_y,  \quad
+  Z_n = c z_n + \beta_z   \\
+  R_x = c r_x + \eta_x,   \quad
+  R_y = c r_y + \eta_y,   \quad
+  R_z = c r_z + \eta_z    \\
   A_j = c a_j + \alpha_j, \; j=1..4  \\
   R_a = c \rho_1 + \rho_0
 \end{gather}
 
 \item
-  proof verification
+  Proof verification
 \begin{gather}
 \label{verf-distn}
-  g^{c^2d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} b_1^{-c} b_0^{-1} = 1  \\
-  g^{X_n} h^{R_x} s_x^{-c} t_x^{-1} = 1,  \;
-  g^{Y_n} h^{R_y} s_y^{-c} t_y^{-1} = 1,  \;
-  g^{Z_n} h^{R_z} s_z^{-c} t_z^{-1} = 1
+  g^{c^2d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{c} b_0 \\
+%  g^{c^2d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{-c} b_0^{-1} \\
+  g^{X_n} h^{R_x} s_x^{-c} = t_x,  \quad
+  g^{Y_n} h^{R_y} s_y^{-c} = t_y,  \quad
+  g^{Z_n} h^{R_z} s_z^{-c} = t_z
 %  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
 \end{gather}
   
@@ -86,22 +106,35 @@ Consider quadratic (degree 2 in $v$) polynomial
 \begin{multline}
   f_V(v) = f_2 v^2 + f_1 v + f_0 = \\
   v^2 d - (((v x_n + \beta_x) - v x_l)^2 +
-           ((v y_n + \beta_y) - c y_l)^2 +
-           ((v z_n + \beta_z) - c z_l)^2)  \\
+           ((v y_n + \beta_y) - v y_l)^2 +
+           ((v z_n + \beta_z) - v z_l)^2)  \\
         - ((v a_1 + \alpha_1)^2 +
            (v a_2 + \alpha_2)^2 +
            (v a_3 + \alpha_3)^2 +
            (v a_4 + \alpha_4)^2)
 \end{multline}
-Major point is, this polynomial is actually linear ($f_2 = 0$, degree-one in $v$)
+This polynomial is actually linear ($f_2 = 0$, degree-one in $v$)
 if, and only if
-statement about distance~\eqref{eq-distn} holds for hidden node coordinates.
-We evaluate this polynomial at a random point chosen as challenge of verifier.
+statement about distance~\eqref{eq-distn} holds for node coordinates that are hidden from verifier.
+We evaluate this polynomial at a random point chosen as the challenge of verifier.
 It follows, distance verification equation~\eqref{verf-distn}
 only needs constant $b_0$ and degree-one $b_1^c$ components.
 \begin{gather}
-  f_0 = -\beta_x^2 - \beta_y^2 - \beta_z^2 - \alpha_1^2 - \alpha_2^2 - \alpha_3^2 - \alpha_4^2 \\
-  f_1 = -2 x_n \beta_x  -2 y_n \beta_y  -2 z_n \beta_z
-        -2 a_1 \alpha_1 -2 a_2 \alpha_2 -2 a_3 \alpha_3 -2 a_4 \alpha_4
+  f_0 = -\beta_x^2 - \beta_y^2 - \beta_z^2 - \alpha_1^2 - \alpha_2^2 - \alpha_3^2 - \alpha_4^2
 \end{gather}
+\begin{multline}
+  f_1 = -2 (x_n - x_l) \beta_x  -2 (y_n - y_l) \beta_y  -2 (z_n - z_l) \beta_z \\
+        -2 a_1 \alpha_1 -2 a_2 \alpha_2 -2 a_3 \alpha_3 -2 a_4 \alpha_4
+\end{multline}
+Prover calculates $b_0, b_1$ from $f_0, f_1$.
+
+\section{Todo}
+
+Add awarding (payment) part to the proof system.\\
+Specify ranges for random numbers.\\
+Introduce accumulator for a set of time-locations. \\
+Design enforcement for ``just one single location at a time''. \\
+Add references (bibliography).
+
 \end{document}
+
