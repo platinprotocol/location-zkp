@@ -1,0 +1,75 @@
+MIME-Version: 1.0
+Received: by 10.223.160.73 with HTTP; Fri, 11 May 2018 15:10:43 -0700 (PDT)
+Date: Sat, 12 May 2018 01:10:43 +0300
+Delivered-To: vadym@platin.io
+Message-ID: <CAOp4L3W57eiZHGqQriMQ+8RE8HUHYZiF8+JggC0kDAa97ug48g@mail.gmail.com>
+Subject: proof of distance small enough
+From: Vadym Fedyukovych <vadym@platin.io>
+To: Lionel Wolberger <lionel@platin.io>
+Cc: Allon Mason <allon@platin.io>, Mykhailo Tiutin <mike@platin.io>
+Content-Type: multipart/mixed; boundary="00000000000036ffa2056bf568f2"
+
+--00000000000036ffa2056bf568f2
+Content-Type: multipart/alternative; boundary="00000000000036ff9d056bf568f0"
+
+--00000000000036ff9d056bf568f0
+Content-Type: text/plain; charset="UTF-8"
+
+Hi Lionel,
+
+please let me outline what is known doable about private location proof.
+"Location matching--a node at x,y,z can claim a coin at x,y,z, blinded" at
+Trello.
+
+This matching could be proved by node as "distance is below a threshold".
+Let's refine the usecase as follows:
+node claims a coin by creating a (non-interactive?) zero-knowledge proof
+that
+distance between node with coordinates (x_n, y_n, z_n)
+and given location (x_l, y_l, z_l) is at most d,
+with Pithagorean theorem and some reasonable thershold distance, say 10
+meters.
+Commitment to node coordinates is the input to verifier, together with
+given coordinates;
+prover private input is node location.
+
+Unlike U-Prove or CL-based credentials,
+data to be proved is integers,
+not finite field or ring elements (no modulo something).
+Proofs about integers are possible in Idemix setup, group of a hidden order,
+introduced by Camenisch-Stadler.
+
+Efficient "more than" proof, introduced by Lipmaa,
+would include four-squares representation
+for threshold-distance difference:
+d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 +
+a_3^2 + a^4
+Lagrange theorem states existence of this representation for any
+non-negative integer.
+This is latex notation that looks better in pdf.
+
+A similar proof was presented at IEEE SMSDP 2010, attached.
+
+https://en.wikipedia.org/wiki/Lagrange%27s_four-square_theorem
+http://pollack.uga.edu/finding4squares.pdf
+
+Further development would include an accumulator in place of individual
+commitments
+to locations at different times.
+Plating would enforce "just one single location at a time, committed or
+accumulated" somehow.
+
+A group of a hidden order might be implemented in libsnark some day;
+Idemix is suitable as-is to implement this proof.
+
+With best regards,
+Vadym
+
+--00000000000036ff9d056bf568f0--
+--00000000000036ffa2056bf568f2
+Content-Type: application/pdf; name="vf_smsdp_2010.pdf"
+Content-Disposition: attachment; filename="vf_smsdp_2010.pdf"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_jh2i26bg0
+
+--00000000000036ffa2056bf568f2--
