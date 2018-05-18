@@ -1,0 +1,12 @@
+Lionel May 12
+..Lagrange 4-squares may not scale well. We should check this.
+
+Computational complexity of finding 4-squares
+is poly-logarithmic (square of logarithm of the target):
+FINDING THE FOUR SQUARES IN LAGRANGE’S THEOREM
+Paul Pollack, Enrique Trevino
+http://pollack.uga.edu/finding4squares.pdf
+
+Allon May 12
+..add a title area with abstract
+

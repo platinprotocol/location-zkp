@@ -144,28 +144,30 @@ Users unblind their intermediate tokens and periodically exchange them for Plati
 \begin{enumerate}
 \item
   Issuer (map service) chooses random $\gamma$
-  and sends $\bar w$ to Recipient
+  and sends $\tilde w$ to Recipient
 \begin{gather}
-  \bar w = g_i^{\gamma}
+  \tilde w = g_i^{\gamma}
 \end{gather}
   
 \item
   Recipient (node) chooses random blinding $(\delta, \mu)$,
-  produces blinded challenge~$\bar c_i$ and sends it to Issuer
+  produces blinded challenge~$\tilde c_i$ and sends it to Issuer
 \begin{gather}
-  w = \bar w g_i^{-\delta} X_i^{\mu} \\
-  \bar c_i = H(w) + \mu  \pmod{q}
+  w = \tilde w g_i^{-\delta} X_i^{\mu} \\
+  \tilde c_i = H(w) + \mu  \pmod{q}
 \end{gather}
 \item
-  Issuer produces blinded response $\bar r_i$ and sends it to Recipient
+  Issuer produces blinded response $\tilde r_i$ and sends it to Recipient
 \begin{gather}
-  \bar r_i = \bar c_i x_i + \gamma  \pmod{q}
+  \tilde r_i = \tilde c_i x_i + \gamma  \pmod{q}
 \end{gather}
 \item
-  Recipient unblinds challenge and response
+  Recipient verifies validity of response received and
+  unblinds challenge and response
 \begin{gather}
-  c_i = \bar c_i - \mu  \pmod{q} \\
-  r_i = \bar r_i - \delta  \pmod{q}
+  \tilde c_i = H(g_i^{\tilde r_i} X_i^{- \tilde c_i}) \\
+  c_i = \tilde c_i - \mu  \pmod{q} \\
+  r_i = \tilde r_i - \delta  \pmod{q}
 \end{gather}
   Intermediate token is $(c_i, r_i)$.
   
@@ -173,15 +175,26 @@ Users unblind their intermediate tokens and periodically exchange them for Plati
   Intermediate token verification (while exchange for Platin tokens)
 \begin{gather}
   c_i = H(g_i^{r_i} X_i^{-c_i})
-%  w = g_i^{(\bar c_i x + \gamma) - \delta} X_i^{- \bar c_i + \mu} = \bar w g_i^{-\delta} X_i^{\mu}
+% do not delete
+%  w = g_i^{(\tilde c_i x + \gamma) - \delta} X_i^{- \bar c_i + \mu} = \tilde w g_i^{-\delta} X_i^{\mu}
 \end{gather}
 \end{enumerate}
 
-%\section{Intermediate token properties}
+\section{Intermediate token properties}
 
-%Both components of intermediate token
-%are statistically (unconditionally) independent from blinded intermediate token.
+Both components of intermediate token
+are statistically (unconditionally) independent from blinded intermediate token.
 
+Consider an Adversary trying to distinguish two pairs of unblinded intermediate tokens $(c_1, r_1)$ and $(c_2, r_2)$,
+matching them to issuing session identified with $\tilde w$.
+View of Issuer is $(\tilde c_i, \tilde r_i, c_j, r_j)$  for $j=1,2$.
+\begin{gather}
+  g_i^{r_j} X_i^{-c_i} \stackrel{?}{=} \tilde w g_i^{-\delta_j} X_i^{\mu_j} =
+                                    \tilde w g_i^{r_j - \tilde r_i} X_i^{\tilde c_i - c_j} =
+                                    (\tilde w g_i^{- \tilde r_i} X_i^{\tilde c_i}) (g_i^{r_j} X_i^{- c_j})
+\end{gather}
+It could be seen that the only possible relation does not depend on issuing session identifier $\tilde w$,
+resulting in unconditional privacy for intermediate tokens.
 
 \section{Todo}
 
