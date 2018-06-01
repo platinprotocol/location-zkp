@@ -9,7 +9,8 @@
 %       vadym at platin.io
   }
 }
-\title{Private location verification with incentivization\\
+\title{Platin Privacy Protocol \\
+  Private location verification with incentivization\\
   \small{in-progress}
 }
 
@@ -51,6 +52,20 @@ Node picks random $(r_x, r_y, r_z)$, creates commitment $(s_x, s_y, s_z)$ to it'
 and keeps coordinates-randoms pairs
 $(x_n, y_n, z_n)$, $(r_x, r_y, r_z)$
 private.
+
+\subsection{Representation-based commitment}
+Following U-Prove, consider commitment scheme resulting in a single group element:
+\begin{gather}
+  s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} h^{r}
+\end{gather}
+where $g_x, g_y, g_z$ are group elements, and $r$ is a random.
+This scheme admits a proof of knowledge with the same responses required form threshold location verification.
+This scheme can be extended with additional components. % like set of wireless station% name-power pairs.
+
+\subsection{Two-level commitment}
+To achive eexpected properties of Merkle-tree based scheme while keeping an option
+to run location proof protocols,
+representation-based commitments could be leaves of Merkle tree.
 
 \section{Proof}
 Sigma-protocol with 3 messages.
@@ -128,6 +143,59 @@ only needs constant $b_0$ and degree-one $b_1^c$ components.
 \end{multline}
 Prover calculates $b_0, b_1$ from $f_0, f_1$.
 
+\section{Not-at-location proof}
+
+Proving a negative location statement is a valid usecase,
+that could be demonstrated with ``not at the grocery store'' scenario.
+Rather that priving ``distance is smaller than''~\eqref{eq-distn},
+complementary ``is larger'' proof is given. % as follows:
+In the following, we only show changes required to the main protocol.
+\begin{gather}
+\label{eq-distn-more}
+  ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) - d^2 = a_1^2 + a_2^2 + a_3^2 + a_4^2  \\
+\label{verf-distn-more}
+  g^{((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - c^2 d - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{c} b_0 
+\end{gather}
+\begin{multline}
+\label{eq-coeff-more}
+  f_V(v) = f_2 v^2 + f_1 v + f_0 = \\
+  (((v x_n + \beta_x) - v x_l)^2 +
+   ((v y_n + \beta_y) - v y_l)^2 +
+   ((v z_n + \beta_z) - v z_l)^2)
+  - v^2 d \\
+  - ((v a_1 + \alpha_1)^2 +
+     (v a_2 + \alpha_2)^2 +
+     (v a_3 + \alpha_3)^2 +
+     (v a_4 + \alpha_4)^2)
+\end{multline}
+
+\section{Logical-OR threshold location}
+
+Consider a franchise operating multiple stores,
+and a usecase of proving location is ``at Starbucks'' without telling which one of $K$ known.
+We define each such store with it's center $(x_k, y_k, z_k)$ and radius (size)~$d_k$, $k \in [1 .. K]$.
+We elaborate basic threshold proof such that prover can produce
+4-squares representation for center-size of some store $k=p$,
+and pick arbitrary 4-tuples for all other stores $k \ne p$.
+\begin{multline}
+\label{eq-distn-or}
+  \prod_{k=1}
+    ((d_k^2 - ((x_n - x_k)^2 + (y_n - y_k)^2 + (z_n - z_k)^2) \\
+     - (a_{1, k}^2 + a_{2, k}^2 + a_{3, k}^2 + a_{4, k}^2)) = 0
+\end{multline}
+Verifier is testing that polynomial $f_{KV}(v)$ is of degree $2K-1$, not $2K$.
+\begin{multline}
+  f_{KV}(v) = \sum_{j=0}^{2K} f_j v^j = \\
+  \prod_{k=1}^{K} (
+    v^2 d_k - (((v x_n + \beta_x) - v x_k)^2 +
+               ((v y_n + \beta_y) - v y_k)^2 +
+               ((v z_n + \beta_z) - v z_k)^2)  \\
+        - ((v a_{1,k} + \alpha_1)^2 +
+           (v a_{2,k} + \alpha_2)^2 +
+           (v a_{3,k} + \alpha_3)^2 +
+           (v a_{4,k} + \alpha_4)^2) )
+\end{multline}
+
 \section{Private incentivization}
 
 To engage users, verifier (map service) is giving tokens in exchange for verifying location proofs.
@@ -199,8 +267,10 @@ resulting in unconditional privacy for intermediate tokens.
 \section{Todo}
 
 %Add awarding (payment) part to the proof system.\\
+``Trajectrories are close enough'' proof \\
+%Introduce Merkle tree -based proofs with zk-SNARK. \\
+Introduce accumulator for a set of time-locations, as a feasible alternative for Merkle tree. \\
 Specify ranges for random numbers.\\
-Introduce accumulator for a set of time-locations. \\
 Design enforcement for ``just one single location at a time''. \\
 Add references (bibliography).
 
