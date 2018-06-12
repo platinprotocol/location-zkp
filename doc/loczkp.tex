@@ -24,6 +24,7 @@
 }
 
 \section{Definitions}
+\label{sect-definitions}
 Node proves the statement "distance is within a threshold" (less or equal)
 for node coordinates $(x_n, y_n, z_n)$,
 given location $(x_l, y_l, z_l)$,
@@ -45,6 +46,7 @@ $n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes (Idemix).
 \section{Signals harvesting}
 Node picks random $(r_x, r_y, r_z)$, creates commitment $(s_x, s_y, s_z)$ to it's coordinates
 \begin{gather}
+\label{cmt-pedr}
   s_x = g^{x_n} h^{r_x},   \qquad
   s_y = g^{y_n} h^{r_y},   \qquad
   s_z = g^{z_n} h^{r_z}
@@ -56,6 +58,7 @@ private.
 \subsection{Representation-based commitment}
 Following U-Prove, consider commitment scheme resulting in a single group element:
 \begin{gather}
+\label{cmt-up}
   s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} h^{r}
 \end{gather}
 where $g_x, g_y, g_z$ are group elements, and $r$ is a random.
@@ -63,11 +66,12 @@ This scheme admits a proof of knowledge with the same responses required form th
 This scheme can be extended with additional components. % like set of wireless station% name-power pairs.
 
 \subsection{Two-level commitment}
-To achive eexpected properties of Merkle-tree based scheme while keeping an option
+To achieve expected properties of Merkle-tree based scheme while keeping an option
 to run location proof protocols,
 representation-based commitments could be leaves of Merkle tree.
 
 \section{Proof}
+\label{sect-close}
 Sigma-protocol with 3 messages.
 Public information is node location commitment, given location, threshold, proof parameters.
 Private information is node location and randomness to commitment.
@@ -105,8 +109,7 @@ Private information is node location and randomness to commitment.
   Proof verification
 \begin{gather}
 \label{verf-distn}
-  g^{c^2d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{c} b_0 \\
-%  g^{c^2d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{-c} b_0^{-1} \\
+  g^{c^2 d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{c} b_0 \\
   g^{X_n} h^{R_x} s_x^{-c} = t_x,  \quad
   g^{Y_n} h^{R_y} s_y^{-c} = t_y,  \quad
   g^{Z_n} h^{R_z} s_z^{-c} = t_z
@@ -147,7 +150,7 @@ Prover calculates $b_0, b_1$ from $f_0, f_1$.
 
 Proving a negative location statement is a valid usecase,
 that could be demonstrated with ``not at the grocery store'' scenario.
-Rather that priving ``distance is smaller than''~\eqref{eq-distn},
+Rather that proving ``distance is smaller than''~\eqref{eq-distn},
 complementary ``is larger'' proof is given. % as follows:
 In the following, we only show changes required to the main protocol.
 \begin{gather}
@@ -264,15 +267,125 @@ View of Issuer is $(\tilde c_i, \tilde r_i, c_j, r_j)$  for $j=1,2$.
 It could be seen that the only possible relation does not depend on issuing session identifier $\tilde w$,
 resulting in unconditional privacy for intermediate tokens.
 
-\section{Todo}
+\section{Platin Encoding Standard 01}
+
+With the scenario of user device (node) being close enough to a cell tower
+from sections~\ref{sect-definitions}~and~\ref{sect-close},
+we define encoding of coordinates, commitment, witness and proof of location.
+
+\subsection{Non-interactive proof}
+Fiat-Shamir technique could be applied to produce a challenge $c$
+with proper hash function from concatenation of group elements
+$t_x, t_y, t_z, b_1, b_0$ from first step of interactive protocol.
+Non-interactive proof verification would be
+re-creating most of group elements and
+re-producing the challenge:
+\begin{multline}
+  \label{verf-nidistn}
+  c = H(g^{X_n} h^{R_x} s_x^{-c} || g^{Y_n} h^{R_y} s_y^{-c} || g^{Z_n} h^{R_z} s_z^{-c} || b_1 || \\
+        g^{c^2 d - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} b_1^{-c})
+\end{multline}
+Non-interactive proof is
+\begin{gather}
+\label{encoding-nidistn}
+  (c, (X_n, Y_n, Z_n, A_1, A_2, A_3, A_4), b_1)
+\end{gather}
+with group element $b_1$ and 8 integers.
+With this proof, multiplicative group is used, so group elements are represented as integers.
+
+\subsection{Plaintext encoding of non-interactive proof}
+
+Popular bignumber libraries have plaintext hex representation for bignumbers,
+designed to inter-operate with each other.
+Non-interactive proof is encoded as 9-lines,
+with a large number on each line, in hex encoding,
+in the order given by~\eqref{encoding-nidistn}.
+
+\subsection{Plaintext encoding of location commitment}
+
+U-Prove style commitment~\eqref{cmt-up}
+is a single group element,
+represented as a single-line number in hex encoding.
+
+\subsection{Plaintext encoding of location witness}
+
+Witness is a common term for private data held by prover
+that allows to verify validity of a statement,
+open a commitment instance (equation~\eqref{cmt-up}),
+or run a proof protocol (section~\ref{sect-close}).
+
+Witness is represented as four lines plaintext integer numbers;
+3 lines with $x_n, y_n, z_n$ in decimal,
+and a big random number $r$ in hex encoding.
+
+Additional locations that are input to the protocol
+like coordinates of cell tower $x_l, y_l, z_l$
+are encoded the same as witness:
+3 lines, integer numbers, decimal notation.
+
+\subsection{Plaintext encoding of group elements}
+
+Group is specified with two bignumbers,
+composite modulo $n$ and generator $g$,
+as two lines plaintext, with hex encoding.
+Additional group elements required to produce commitment~\eqref{cmt-up}
+are encoded on following lines the same way.
+
+
+\section{Platin Encoding Standard 02}
+
+Geocoordinates ar generally represented as latitude-longitude-elevation triple,
+that could be further converted into some local x-y-z coordinate system.
+This choice of coordinates apply globally,
+while PES~01 better fit local (like city-scale) statements.
+To commit to lat-lon-el triple, we amend two-level commitment approach
+by converting GPS data into integers and
+commit with the U-Prove-style scheme~\eqref{cmt-up}.
+We commit to a fixed set of locations with Merkle tree,
+with U-Prove commitments considered leaves of the tree.
+
+This two-level scheme requires storage of
+\begin{enumerate}
+\item
+  Original raw lat-lon-el data and
+  scales (multipliers) used to convert them to integers;
+\item
+  Random integer used to produce location commitment;
+\item
+  Commitments (Merkle leaves) and intermediate hashes of the tree;
+\item
+  Merkle root as commitment to the set of location.
+\end{enumerate}
+
+Further design decisions would be taken
+to account for project ideas other than location proofs,
+and for implementation-level needs.
+Location security policy apply for original data and commitment random input.
+
+%\begin{enumerate}
+%\item
+%  Appl
+%\end{enumerate}
+  
+%\subsection{}
+
+\end{document}
+
+Platin location primitive
+uuid
+t time
+x,y,z
+example (10.4)
+error
+
+
+
+Todo
 
 %Add awarding (payment) part to the proof system.\\
-``Trajectrories are close enough'' proof \\
+``Trajectories are close enough'' proof \\
 %Introduce Merkle tree -based proofs with zk-SNARK. \\
 Introduce accumulator for a set of time-locations, as a feasible alternative for Merkle tree. \\
 Specify ranges for random numbers.\\
 Design enforcement for ``just one single location at a time''. \\
 Add references (bibliography).
-
-\end{document}
-
