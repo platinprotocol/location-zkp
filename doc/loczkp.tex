@@ -334,11 +334,11 @@ are encoded on following lines the same way.
 
 \section{Platin Encoding Standard 02}
 
-Geocoordinates ar generally represented as latitude-longitude-elevation triple,
+Geo-coordinates are generally represented as latitude-longitude-altitude triple,
 that could be further converted into some local x-y-z coordinate system.
 This choice of coordinates apply globally,
 while PES~01 better fit local (like city-scale) statements.
-To commit to lat-lon-el triple, we amend two-level commitment approach
+To commit to lat-lon-al triple, we amend two-level commitment approach
 by converting GPS data into integers and
 commit with the U-Prove-style scheme~\eqref{cmt-up}.
 We commit to a fixed set of locations with Merkle tree,
@@ -347,7 +347,7 @@ with U-Prove commitments considered leaves of the tree.
 This two-level scheme requires storage of
 \begin{enumerate}
 \item
-  Original raw lat-lon-el data and
+  Original raw lat-lon-al data and
   scales (multipliers) used to convert them to integers;
 \item
   Random integer used to produce location commitment;
@@ -356,6 +356,12 @@ This two-level scheme requires storage of
 \item
   Merkle root as commitment to the set of location.
 \end{enumerate}
+
+Conversion from lat-lon-al
+can be done with decimal (Decimal degrees, DD) representation of angles (not degrees-minutes-seconds, DMS)
+multiplied by proper power of ten and rounded.
+Keeping 5 digits after the decimal point of DD representation would result in
+approximately one meter (or better) precision.
 
 Further design decisions would be taken
 to account for project ideas other than location proofs,
