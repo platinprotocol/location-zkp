@@ -1,0 +1,54 @@
+Private location verification demo status June 29
+
+Is working:
+All equations (8) and (9) verify properly
+All responses to eq8 and eq9 are ok
+commitments s_U, sa, t_n, t_a, b_0, b_1 are ok
+set parameters, set center, set node location, calculate radius-square are ok
+printing challenges and responses ok
+
+Still to do:
+pick random numbers instead of fixed
+change setup to bignumbers after debug
+introduce key-press for pause (not for docker)
+parse command-line parameter from docker for center and node location
+
+Specific setup for testing:
+alpha[] = {2, 3, 4, 0}     @Prover::step_start()
+    a[] = {0, 3, 1, 4}     @get_airdrop_radius()
+ beta[] =   {3, 2, 1}      @Prover::step_start()
+x_n, y_n, z_n, r = {2, 1, 3, 1}   @main(), set_node_location()
+x_l, y_l, z_l = {3, 4, 5}         @main()
+
+Testing output:
+
+Parameters
+Modulus 11.
+g 4.
+g_x 3.
+g_y 9.
+g_z 5.
+g_r 4.
+h[0] (a_1 generator) 3.
+h[1] (a_2 generator) 9.
+h[2] (a_3 generator) 5.
+h[3] (a_4 generator) 4.
+Location commitment s_U 9.
+Radius-squared 40
+Commitment b_0 4.
+Commitment b_1 9.
+Commitment s_a 5.
+Commitment t_a 9.
+Commitment t_n 5.
+Responses
+X_n 11.
+Y_n 6.
+Z_n 13.
+R  6.
+A_1 2.
+A_2 15.
+A_3 8.
+A_4 16.
+R_a 11.
+R_d 12.
+Proof verified OK
