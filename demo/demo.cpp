@@ -7,6 +7,8 @@
 #include <iostream>
 //#include "cryptopp/integer.h"
 #include "cryptopp/modarith.h"
+#include "cryptopp/rsa.h"
+#include "cryptopp/randpool.h"
 
 class Parameters {
 public:
@@ -341,19 +343,30 @@ int main() {
   Verifier V;
   bool isok;
 
+  CryptoPP::RandomPool randPool;
+  CryptoPP::InvertibleRSAFunction pv;
+  pv.Initialize(randPool, 2048, 3);
+
+  std::cout << "Establishing zero knowledge common reference string" << std::endl;
   SetParameters(Prm);
+  Prm.n = pv.GetPrime1() * pv.GetPrime2();
+
   PrintParameters(Prm);
   P.pp = Prm;
   V.pp = Prm;
 
-  int xn=2, yn=1, zn=3;
-  //  int xn= 19864, yn=77542, zn=4;  // node location
-  set_node_location(P, V, xn, yn, zn);
-  PrintCommitment("Location commitment s_U", V.pubi.su);
-
   int xl=3, yl=4, zl=5;  // center
   //  int xl=22148, yl=81237, zl=16;  // center
   set_airdrop_location(P, V, xl, yl, zl);
+
+  int xn=2, yn=1, zn=3;
+//  std::cout << "Enter Xn: ";
+//  std::cin >> xn;
+//  std::cout << " Now Xn = " << xn << std::endl;
+
+  //  int xn= 19864, yn=77542, zn=4;  // node location
+  set_node_location(P, V, xn, yn, zn);
+  PrintCommitment("Location commitment s_U", V.pubi.su);
 
   int d2;  // radius squared
   d2 = get_airdrop_radius(P, V);  // will be set_radius()
