@@ -3,9 +3,11 @@
  *
  * "Location is close enough" interactive proof implementation
  * described at "Private location verification"
+ *
+ * Single-message signature-like variant
+ * still needs Fiat-Shamir challenge creating and verifying
  */
 #include <iostream>
-//#include "cryptopp/integer.h"
 #include "cryptopp/modarith.h"
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
@@ -20,11 +22,9 @@ public:
 
 class PublicInfo {
 public:
-  void set_center(int x, int y, int z);
-  int get_radius_sq();  // temporary, to be replaced with Rabin-Shallit
 //private:
   CryptoPP::Integer xl, yl, zl,
-    d;  // threshold for distance
+    d;  // threshold for distance (radius)
   CryptoPP::Integer su; // commitment to node_location
 };
 
@@ -59,10 +59,19 @@ public:
   CryptoPP::Integer A[4], Xn, Yn, Zn, R, R_a, R_d;
 };
 
+class sigmsg {
+public:
+  PublicInfo pi;
+  InitialCommitments ic;
+  CryptoPP::Integer challenge;
+  Responses responses;
+};
+
 class Prover {
 public:
 //  void SetParameters(const Parameters &p);
   void step_start();
+  void step_challenge(void);
   void step_responses();
 //private:
   PublicInfo pubi;
@@ -80,7 +89,6 @@ public:
 class Verifier {
 public:
 //  void SetParameters(const Parameters &p);
-  void step_challenge(void);
   bool step_verify();
 
 //private:
@@ -102,7 +110,6 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
              pp.group.Multiply(
 		pp.group.Exponentiate(pp.gz, z),
                 pp.group.Exponentiate(pp.gr, r))));
-  // should be like  group.Add(a, group.Add(b, group.Add(c,d))
   return s;
 }
 
@@ -171,16 +178,6 @@ bool Verifier::step_verify() {
   for(int j=0; j<4; j++)
     pwr -= rsp.A[j] * rsp.A[j];
 
-/*
-  std::cout << "DBG " << 
-    //       rsp.R_d
-    pwr
-	    << std::endl <<
-pp.group.Multiply(
-       pp.group.Exponentiate(ic.b_1, c),
-       ic.b_0)
-	    << std::endl;
-*/
   if(CreateNCommitment(pp, pwr, rsp.R_d)
      !=
      pp.group.Multiply(
@@ -193,8 +190,8 @@ pp.group.Multiply(
   return true;
 }
 
-void Verifier::step_challenge() {
-  c = 4;
+void Prover::step_challenge() {
+  c = 4; // hash()
 }
 
 void Prover::step_start() {
@@ -294,7 +291,7 @@ void Print_responses(const Verifier &v) {
 	    << "R_d " << v.rsp.R_d << std::endl;
 }
 
-void set_node_location(Prover &p, Verifier &v, const int xn, const int yn, const int zn) {
+void set_node_location(Prover &p, const int xn, const int yn, const int zn) {
   p.privi.x = xn;
   p.privi.y = yn;
   p.privi.z = zn;
@@ -303,19 +300,16 @@ void set_node_location(Prover &p, Verifier &v, const int xn, const int yn, const
   CryptoPP::Integer scomm;
   scomm = CreateCommitment(p.pp, p.privi.x, p.privi.y, p.privi.z, p.privi.r);
   p.pubi.su = scomm;
-  v.pubi.su = scomm;
+  //  v.pubi.su = scomm;
 }
 
-void set_airdrop_location(Prover &p, Verifier &v, int xl, int yl, int zl) {
+void set_airdrop_location(Prover &p, int xl, int yl, int zl) {
   p.pubi.xl = xl;
-  v.pubi.xl = xl;
   p.pubi.yl = yl;
-  v.pubi.yl = yl;
   p.pubi.zl = zl;
-  v.pubi.zl = zl;
 }
 
-long get_airdrop_radius(Prover &p, Verifier &v) {
+long get_airdrop_radius(Prover &p) {
   p.privi.a[0] = 0;
   p.privi.a[1] = 3;
   p.privi.a[2] = 1;
@@ -333,7 +327,7 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
   };
 
   p.pubi.d = d2;
-  v.pubi.d = d2;
+  //  v.pubi.d = d2;
   return d2.ConvertToLong();
 }
 
@@ -347,44 +341,36 @@ int main() {
   CryptoPP::InvertibleRSAFunction pv;
   pv.Initialize(randPool, 2048, 3);
 
-  std::cout << "Establishing zero knowledge common reference string" << std::endl;
+  //  std::cout << "Establishing zero knowledge common reference string" << std::endl;
   SetParameters(Prm);
   Prm.n = pv.GetPrime1() * pv.GetPrime2();
 
-  PrintParameters(Prm);
+  //  PrintParameters(Prm);
   P.pp = Prm;
   V.pp = Prm;
 
   int xl=3, yl=4, zl=5;  // center
-  //  int xl=22148, yl=81237, zl=16;  // center
-  set_airdrop_location(P, V, xl, yl, zl);
+  int xn=2, yn=1, zn=3;  // node location
 
-  int xn=2, yn=1, zn=3;
-//  std::cout << "Enter Xn: ";
-//  std::cin >> xn;
-//  std::cout << " Now Xn = " << xn << std::endl;
-
-  //  int xn= 19864, yn=77542, zn=4;  // node location
-  set_node_location(P, V, xn, yn, zn);
-  PrintCommitment("Location commitment s_U", V.pubi.su);
-
-  int d2;  // radius squared
-  d2 = get_airdrop_radius(P, V);  // will be set_radius()
-  std::cout << "Radius-squared " << d2 << std::endl;
-
+  set_airdrop_location(P, xl, yl, zl);
+  set_node_location(P, xn, yn, zn);
+  get_airdrop_radius(P);  // radius squared
   P.step_start();
-  V.ic = P.ic;  // P -> V
-  Print_start(V);
-  //  std::cout << P.ic << std::endl;
-
-  V.step_challenge();
-  P.c = V.c; // V -> P
-  //  std::cout << V.c << std::endl;
-
+  P.step_challenge();
   P.step_responses();
-  V.rsp = P.rsp;  // P -> V
-  Print_responses(V);
-  //  std::cout << P.rsp << std::endl;
+
+  sigmsg sig_produce, sig_verify;
+  sig_produce.pi = P.pubi;
+  sig_produce.ic = P.ic;
+  sig_produce.challenge = P.c;
+  sig_produce.responses = P.rsp;
+
+  sig_verify = sig_produce;  // send-receive
+
+  V.pubi = sig_verify.pi;
+  V.ic = sig_verify.ic;
+  V.c = sig_verify.challenge;
+  V.rsp = sig_verify.responses;
 
   isok = V.step_verify();
   if(isok)

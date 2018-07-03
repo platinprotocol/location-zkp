@@ -1,3 +1,7 @@
+Single-message update July 04
+
+Still need to produce and verify challenge, with hash, Fiat-Shamir
+
 Status update July 03
 
 Working with 2048-bit numbers; output fragment
