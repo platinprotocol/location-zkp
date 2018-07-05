@@ -16,6 +16,9 @@ public:
   CryptoPP::Integer n,
     g, gx, gy, gz, gr, h[4];
   CryptoPP::ModularArithmetic group;
+  int rnd_bitsize_modulus,
+      rnd_bitsize_commitment,
+      rnd_bitsize_chall, rnd_offset_chall;
 };
 
 class PublicInfo {
@@ -62,7 +65,7 @@ public:
 class Prover {
 public:
 //  void SetParameters(const Parameters &p);
-  void step_start();
+  void step_start(CryptoPP::RandomNumberGenerator &rng);
   void step_responses();
 //private:
   PublicInfo pubi;
@@ -80,7 +83,7 @@ public:
 class Verifier {
 public:
 //  void SetParameters(const Parameters &p);
-  void step_challenge(void);
+  void step_challenge(CryptoPP::RandomNumberGenerator &rng);
   bool step_verify();
 
 //private:
@@ -91,6 +94,10 @@ public:
   Responses rsp;
   Parameters pp;
 };
+
+CryptoPP::Integer rnd_commitment(const Parameters &pp, CryptoPP::RandomNumberGenerator &rng) {
+  return CryptoPP::Integer(rng, pp.rnd_bitsize_commitment);
+}
 
 CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer x, const CryptoPP::Integer y, const CryptoPP::Integer z, const CryptoPP::Integer r) {
   CryptoPP::Integer s;
@@ -171,16 +178,6 @@ bool Verifier::step_verify() {
   for(int j=0; j<4; j++)
     pwr -= rsp.A[j] * rsp.A[j];
 
-/*
-  std::cout << "DBG " << 
-    //       rsp.R_d
-    pwr
-	    << std::endl <<
-pp.group.Multiply(
-       pp.group.Exponentiate(ic.b_1, c),
-       ic.b_0)
-	    << std::endl;
-*/
   if(CreateNCommitment(pp, pwr, rsp.R_d)
      !=
      pp.group.Multiply(
@@ -193,24 +190,25 @@ pp.group.Multiply(
   return true;
 }
 
-void Verifier::step_challenge() {
-  c = 4;
+void Verifier::step_challenge(CryptoPP::RandomNumberGenerator &rng) {
+  c = CryptoPP::Integer(rng, pp.rnd_bitsize_chall);
 }
 
-void Prover::step_start() {
-  privi.gamma = 2;
+void Prover::step_start(CryptoPP::RandomNumberGenerator &rng) {
+  privi.gamma = rnd_commitment(pp, rng);
   ic.sa = CreateACommitment(pp, privi.gamma, privi.a);
-  //  std::cout << "SA " << ic.sa << std::endl;
+  //  std::cout << "Gamma " << privi.gamma << std::endl;
 
-  privpf.eta = 3;
+  privpf.eta = rnd_commitment(pp, rng);
   for(int j=0; j<4; j++)
-    privpf.alpha[j] = (j+2)%5;
+    privpf.alpha[j] = rnd_commitment(pp, rng);
   ic.t_a = CreateACommitment(pp, privpf.eta, privpf.alpha);
 
-  privpf.beta_x = 3;
-  privpf.beta_y = 2;
-  privpf.beta_z = 1;
-  privpf.beta_r = 2;
+  // CryptoPP::Integer rnd_commitment(const Parameters &pp, CryptoPP::RandomNumberGenerator &rng)
+  privpf.beta_x = rnd_commitment(pp, rng);
+  privpf.beta_y = rnd_commitment(pp, rng);
+  privpf.beta_z = rnd_commitment(pp, rng);
+  privpf.beta_r = rnd_commitment(pp, rng);
   ic.t_n = CreateCommitment(pp, privpf.beta_x, privpf.beta_y, privpf.beta_z, privpf.beta_r);
 
   privpf.f_0 = -(privpf.beta_x * privpf.beta_x + privpf.beta_y * privpf.beta_y + privpf.beta_z * privpf.beta_z);
@@ -221,12 +219,8 @@ void Prover::step_start() {
     privpf.f_1 +=  privi.a[j] * privpf.alpha[j];
   }
   privpf.f_1 *= -2;
-/*
-  std::cout << "f_0 " << privpf.f_0 << std::endl
-	    << "f_1 " << privpf.f_1 << std::endl;
-*/
-  privpf.rho_0 = 4;
-  privpf.rho_1 = 2;
+  privpf.rho_0 = rnd_commitment(pp, rng);
+  privpf.rho_1 = rnd_commitment(pp, rng);
 
   ic.b_0 = CreateNCommitment(pp, privpf.f_0, privpf.rho_0);
   ic.b_1 = CreateNCommitment(pp, privpf.f_1, privpf.rho_1);
@@ -245,8 +239,17 @@ void Prover::step_responses() {
   rsp.R_d = c*privpf.rho_1 + privpf.rho_0;
 }
 
-void SetParameters(Parameters &pp) {
-  pp.n = 11;
+void SetParameters(Parameters &pp, CryptoPP::RandomNumberGenerator &rng) {
+  pp.rnd_bitsize_modulus = 2048;
+  pp.rnd_bitsize_commitment = 20; // 200;
+  pp.rnd_bitsize_chall = 100;
+  pp.rnd_offset_chall = 100;
+
+  CryptoPP::InvertibleRSAFunction pv;
+  pv.Initialize(rng, pp.rnd_bitsize_modulus, 3);
+  pp.n = pv.GetPrime1() * pv.GetPrime2();
+  pp.n = 37; // 11; // 89*73; // 11;
+
   pp.group.SetModulus(pp.n);
   pp.g = 4;
   pp.gx = 3;
@@ -326,7 +329,6 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
     (p.privi.x - p.pubi.xl) * (p.privi.x - p.pubi.xl) +
     (p.privi.y - p.pubi.yl) * (p.privi.y - p.pubi.yl) +
     (p.privi.z - p.pubi.zl) * (p.privi.z - p.pubi.zl);
-  //  std::cout << "D2 diff " << d2 << std::endl;
 
   for(int j=0; j<4; j++) {
     d2 += p.privi.a[j] * p.privi.a[j];
@@ -344,47 +346,47 @@ int main() {
   bool isok;
 
   CryptoPP::RandomPool randPool;
-  CryptoPP::InvertibleRSAFunction pv;
-  pv.Initialize(randPool, 2048, 3);
 
   std::cout << "Establishing zero knowledge common reference string" << std::endl;
-  SetParameters(Prm);
-  Prm.n = pv.GetPrime1() * pv.GetPrime2();
+  SetParameters(Prm, randPool);
 
   PrintParameters(Prm);
   P.pp = Prm;
   V.pp = Prm;
 
   int xl=3, yl=4, zl=5;  // center
-  //  int xl=22148, yl=81237, zl=16;  // center
   set_airdrop_location(P, V, xl, yl, zl);
+  std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << std::endl;
+  std::cout << "Pause";
+  std::cin.get();
 
-  int xn=2, yn=1, zn=3;
+  int xn=2, yn=1, zn=3;  // node location
 //  std::cout << "Enter Xn: ";
 //  std::cin >> xn;
 //  std::cout << " Now Xn = " << xn << std::endl;
-
-  //  int xn= 19864, yn=77542, zn=4;  // node location
   set_node_location(P, V, xn, yn, zn);
-  PrintCommitment("Location commitment s_U", V.pubi.su);
+  std::cout << "Pocket location " << xn << ", " << yn << ", " << zn << std::endl;
+  std::cout << "Pause";
+  std::cin.get();
+
+  PrintCommitment("Pocket location commitment s_U", V.pubi.su);
 
   int d2;  // radius squared
   d2 = get_airdrop_radius(P, V);  // will be set_radius()
   std::cout << "Radius-squared " << d2 << std::endl;
 
-  P.step_start();
+  P.step_start(randPool);
   V.ic = P.ic;  // P -> V
   Print_start(V);
-  //  std::cout << P.ic << std::endl;
 
-  V.step_challenge();
+  V.step_challenge(randPool);
   P.c = V.c; // V -> P
-  //  std::cout << V.c << std::endl;
+  std::cout << "Challenge " // << std::endl
+            << V.c << std::endl;
 
   P.step_responses();
   V.rsp = P.rsp;  // P -> V
   Print_responses(V);
-  //  std::cout << P.rsp << std::endl;
 
   isok = V.step_verify();
   if(isok)
