@@ -10,6 +10,8 @@
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
 
+//#define ENABLE_PAUSE
+
 class Parameters {
 public:
 //private:
@@ -46,7 +48,7 @@ public:
   CryptoPP::Integer
     alpha[4], eta,
     rho_0, rho_1,
-    beta_x, beta_y, beta_z, beta_r,   
+    beta_x, beta_y, beta_z, beta_r,
     f_0, f_1;
 };
 
@@ -88,7 +90,7 @@ public:
 
 //private:
   PublicInfo pubi;
-  
+
   InitialCommitments ic;
   CryptoPP::Integer c;  // challenge
   Responses rsp;
@@ -144,7 +146,7 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
   //  return t;
 
   s = pp.group.Multiply(t,
-        pp.group.Exponentiate(pp.gr, rho)); 
+        pp.group.Exponentiate(pp.gr, rho));
 /*
   std::cout << "f " << f << std::endl;
   std::cout << "rho " << rho << std::endl;
@@ -155,7 +157,7 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
 }
 
 void PrintCommitment(const std::string title, const CryptoPP::Integer comm) {
-  std::cout << title << " " 
+  std::cout << title << " "
 	    << comm << std::endl;
 }
 
@@ -362,8 +364,10 @@ int main() {
   P.pp = Prm;
   V.pp = Prm;
 
-  std::cout << "Pause";
-  //  std::cin.get();
+  std::cout << "Pause" << std::endl << std::endl;
+  #ifdef ENABLE_PAUSE
+    std::cin.get();
+  #endif
   std::cout << std::endl;
   int xl=3, yl=4, zl=5, RR;  // center
   std::cout << "** Platin Airdrop Request **"  << std::endl <<
@@ -383,10 +387,12 @@ int main() {
   set_airdrop_location(P, V, xl, yl, zl);
   std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << std::endl;
 
-  std::cout << "Pause";
+  std::cout << "Pause" << std::endl << std::endl;
   std::cout << std::endl;
-  //  std::cin >> RR;
-  //  std::cin.get();
+  #ifdef ENABLE_PAUSE
+    std::cin >> RR;
+    std::cin.get();
+  #endif
   int xn=2, yn=1, zn=3;  // node location
   std::cout << "** Platin Pocket Teleport Request **" << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), pocket_address\n Example: 2,1,3,UUID" << std::endl;
@@ -402,9 +408,10 @@ int main() {
   set_node_location(P, V, xn, yn, zn);
   std::cout << "Pocket location " << xn << ", " << yn << ", " << zn << std::endl;
 
-  std::cout << "Pause";
-  //  std::cin.get();
-  std::cout << std::endl;
+  std::cout << "Pause" << std::endl << std::endl;
+  #ifdef ENABLE_PAUSE
+    std::cin.get();
+  #endif
   std::cout << "** Platin Pocket Begin Location Claim **"  << std::endl <<
                "Producing zero knowledge commitment "  << std::endl <<
                "Sharing with Plexus" << std::endl;
@@ -418,9 +425,10 @@ int main() {
   V.ic = P.ic;  // P -> V
   Print_start(V);
 
-  std::cout << "Pause";
-  //  std::cin.get();
-  std::cout << std::endl;
+  std::cout << "Pause" << std::endl << std::endl;
+  #ifdef ENABLE_PAUSE
+    std::cin.get();
+  #endif
   std::cout << "** Plexus Policy: Zero Knowledge Location Commitment Received **"  << std::endl <<
                "Generating Random Challenge"  << std::endl <<
                "Sharing with Plexus" << std::endl;
@@ -429,8 +437,11 @@ int main() {
   std::cout << "Challenge " // << std::endl
             << V.c << std::endl;
 
-  std::cout << "Pause";
-  //  std::cin.get();
+  std::cout << "Pause" << std::endl << std::endl;
+  #ifdef ENABLE_PAUSE
+    std::cin.get();
+  #endif
+
   std::cout << std::endl;
   std::cout << "** Platin Pocket: Challenge Received **"  << std::endl <<
                "Generating Challenge Response"  << std::endl <<
@@ -439,8 +450,10 @@ int main() {
   V.rsp = P.rsp;  // P -> V
   Print_responses(V);
 
-  std::cout << "Pause";
-  //  std::cin.get();
+  std::cout << "Pause" << std::endl << std::endl;
+  #ifdef ENABLE_PAUSE
+    std::cin.get();
+  #endif
   std::cout << std::endl;
   std::cout << "** Plexus Policy: Challenge Response Received *"  << std::endl <<
                "Calculate zero knowledge protocol - location blinded"  << std::endl <<
