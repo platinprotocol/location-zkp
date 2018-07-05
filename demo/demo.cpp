@@ -27,7 +27,7 @@ public:
   int get_radius_sq();  // temporary, to be replaced with Rabin-Shallit
 //private:
   CryptoPP::Integer xl, yl, zl,
-    d;  // threshold for distance
+    d2;  // threshold for distance, squared
   CryptoPP::Integer su; // commitment to node_location
 };
 
@@ -145,7 +145,12 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
 
   s = pp.group.Multiply(t,
         pp.group.Exponentiate(pp.gr, rho)); 
-
+/*
+  std::cout << "f " << f << std::endl;
+  std::cout << "rho " << rho << std::endl;
+  std::cout << "exp(f) " << t << std::endl;
+  std::cout << "comm   " << s << std::endl;
+*/
   return s;
 }
 
@@ -171,7 +176,7 @@ bool Verifier::step_verify() {
      ic.t_a)
     return false;
 
-  CryptoPP::Integer pwr = c * c * pubi.d * pubi.d - (
+  CryptoPP::Integer pwr = c * c * pubi.d2 - (
     (rsp.Xn - c * pubi.xl)*(rsp.Xn - c * pubi.xl) +
     (rsp.Yn - c * pubi.yl)*(rsp.Yn - c * pubi.yl) +
     (rsp.Zn - c * pubi.zl)*(rsp.Zn - c * pubi.zl));
@@ -197,14 +202,12 @@ void Verifier::step_challenge(CryptoPP::RandomNumberGenerator &rng) {
 void Prover::step_start(CryptoPP::RandomNumberGenerator &rng) {
   privi.gamma = rnd_commitment(pp, rng);
   ic.sa = CreateACommitment(pp, privi.gamma, privi.a);
-  //  std::cout << "Gamma " << privi.gamma << std::endl;
 
   privpf.eta = rnd_commitment(pp, rng);
   for(int j=0; j<4; j++)
     privpf.alpha[j] = rnd_commitment(pp, rng);
   ic.t_a = CreateACommitment(pp, privpf.eta, privpf.alpha);
 
-  // CryptoPP::Integer rnd_commitment(const Parameters &pp, CryptoPP::RandomNumberGenerator &rng)
   privpf.beta_x = rnd_commitment(pp, rng);
   privpf.beta_y = rnd_commitment(pp, rng);
   privpf.beta_z = rnd_commitment(pp, rng);
@@ -248,18 +251,23 @@ void SetParameters(Parameters &pp, CryptoPP::RandomNumberGenerator &rng) {
   CryptoPP::InvertibleRSAFunction pv;
   pv.Initialize(rng, pp.rnd_bitsize_modulus, 3);
   pp.n = pv.GetPrime1() * pv.GetPrime2();
-  pp.n = 37; // 11; // 89*73; // 11;
 
+// (19 * 10 + 1)*(103 = 17 * 6 + 1) = 191*103 = 19673;  order 17*19 = 323, co-order 30
+  pp.n = 19673;
   pp.group.SetModulus(pp.n);
-  pp.g = 4;
-  pp.gx = 3;
-  pp.gy = 9;
-  pp.gz = 5;
-  pp.gr = 4;
-  pp.h[0] = 3;
-  pp.h[1] = 9;
-  pp.h[2] = 5;
-  pp.h[3] = 4;
+
+// 4323 = 4^30%19673
+// 4323^323%19673 = 1
+  pp.g = 4323;
+
+  pp.gx = 18652;
+  pp.gy = 12642;
+  pp.gz = 19445;
+  pp.gr = 17679;
+  pp.h[0] = 16385;
+  pp.h[1] = 9555;
+  pp.h[2] = 12638;
+  pp.h[3] = 2153;
 };
 
 void PrintParameters(const Parameters &pp) {
@@ -301,7 +309,7 @@ void set_node_location(Prover &p, Verifier &v, const int xn, const int yn, const
   p.privi.x = xn;
   p.privi.y = yn;
   p.privi.z = zn;
-  p.privi.r = 1;
+  p.privi.r = 1; // rnd_commitment(pp, rng);
 
   CryptoPP::Integer scomm;
   scomm = CreateCommitment(p.pp, p.privi.x, p.privi.y, p.privi.z, p.privi.r);
@@ -334,8 +342,8 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
     d2 += p.privi.a[j] * p.privi.a[j];
   };
 
-  p.pubi.d = d2;
-  v.pubi.d = d2;
+  p.pubi.d2 = d2;
+  v.pubi.d2 = d2;
   return d2.ConvertToLong();
 }
 
@@ -354,22 +362,53 @@ int main() {
   P.pp = Prm;
   V.pp = Prm;
 
-  int xl=3, yl=4, zl=5;  // center
+  std::cout << "Pause";
+  //  std::cin.get();
+  std::cout << std::endl;
+  int xl=3, yl=4, zl=5, RR;  // center
+  std::cout << "** Platin Airdrop Request **"  << std::endl <<
+               "Format: Lat/Long coordinates (x,y,z), radius (R), currency (BTC,ETH), Amount."  << std::endl <<
+               "Example: 3,4,5, 70, BTC,1.0" << std::endl;
+  /*
+  std::cout << "Enter XL: ";
+  std::cin >> xl;
+  std::cout << "Enter YL: ";
+  std::cin >> yl;
+  std::cout << "Enter ZL: ";
+  std::cin >> zl;
+  std::cout << "Enter R: ";
+  std::cin >> RR;
+  */
+  std::cout << " Now XL = " << xl << " YL = " << yl << " ZL = " << zl << std::endl;
   set_airdrop_location(P, V, xl, yl, zl);
   std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << std::endl;
-  std::cout << "Pause";
-  std::cin.get();
 
+  std::cout << "Pause";
+  std::cout << std::endl;
+  //  std::cin >> RR;
+  //  std::cin.get();
   int xn=2, yn=1, zn=3;  // node location
-//  std::cout << "Enter Xn: ";
-//  std::cin >> xn;
-//  std::cout << " Now Xn = " << xn << std::endl;
+  std::cout << "** Platin Pocket Teleport Request **" << std::endl <<
+               "Format: Lat/Long coordinates (x,y,z), pocket_address\n Example: 2,1,3,UUID" << std::endl;
+  /*
+  std::cout << "Enter XN: ";
+  std::cin >> xn;
+  std::cout << "Enter YN: ";
+  std::cin >> yn;
+  std::cout << "Enter ZN: ";
+  std::cin >> zn;
+  */
+  std::cout << " Now XN = " << xn << " YN = " << yn << " ZN = " << zn << std::endl;
   set_node_location(P, V, xn, yn, zn);
   std::cout << "Pocket location " << xn << ", " << yn << ", " << zn << std::endl;
-  std::cout << "Pause";
-  std::cin.get();
 
-  PrintCommitment("Pocket location commitment s_U", V.pubi.su);
+  std::cout << "Pause";
+  //  std::cin.get();
+  std::cout << std::endl;
+  std::cout << "** Platin Pocket Begin Location Claim **"  << std::endl <<
+               "Producing zero knowledge commitment "  << std::endl <<
+               "Sharing with Plexus" << std::endl;
+  //  PrintCommitment("Pocket location commitment s_U", V.pubi.su);
 
   int d2;  // radius squared
   d2 = get_airdrop_radius(P, V);  // will be set_radius()
@@ -379,15 +418,33 @@ int main() {
   V.ic = P.ic;  // P -> V
   Print_start(V);
 
+  std::cout << "Pause";
+  //  std::cin.get();
+  std::cout << std::endl;
+  std::cout << "** Plexus Policy: Zero Knowledge Location Commitment Received **"  << std::endl <<
+               "Generating Random Challenge"  << std::endl <<
+               "Sharing with Plexus" << std::endl;
   V.step_challenge(randPool);
   P.c = V.c; // V -> P
   std::cout << "Challenge " // << std::endl
             << V.c << std::endl;
 
+  std::cout << "Pause";
+  //  std::cin.get();
+  std::cout << std::endl;
+  std::cout << "** Platin Pocket: Challenge Received **"  << std::endl <<
+               "Generating Challenge Response"  << std::endl <<
+               "Sharing with Plexus" << std::endl;
   P.step_responses();
   V.rsp = P.rsp;  // P -> V
   Print_responses(V);
 
+  std::cout << "Pause";
+  //  std::cin.get();
+  std::cout << std::endl;
+  std::cout << "** Plexus Policy: Challenge Response Received *"  << std::endl <<
+               "Calculate zero knowledge protocol - location blinded"  << std::endl <<
+               "Return true or false" << std::endl;
   isok = V.step_verify();
   if(isok)
     std::cout << "Proof verified OK" << std::endl;
