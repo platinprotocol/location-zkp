@@ -1,7 +1,7 @@
-CFLAGS = -g2 -O3 -fPIC -pthread -pipe
+CFLAGS = -g2 -O3 -fPIC -pthread -pipe 
 CRYPTOPP = ..
 CFLAGS += -I$(CRYPTOPP)
-LIBS = -L$(CRYPTOPP)/cryptopp  -lcryptopp
+LIBS = -L$(CRYPTOPP)/cryptopp  -lcryptopp -lcurses
 
 all:	demo
 

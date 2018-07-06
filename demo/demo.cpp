@@ -5,12 +5,15 @@
  * described at "Private location verification"
  */
 #include <iostream>
-//#include "cryptopp/integer.h"
+#include <math.h>
+#include <unistd.h>
+#include <term.h>
+#include "cryptopp/integer.h"
 #include "cryptopp/modarith.h"
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
 
-//#define ENABLE_PAUSE
+#define ENABLE_PAUSE
 
 class Parameters {
 public:
@@ -319,16 +322,32 @@ void set_node_location(Prover &p, Verifier &v, const int xn, const int yn, const
   v.pubi.su = scomm;
 }
 
-void set_airdrop_location(Prover &p, Verifier &v, int xl, int yl, int zl) {
+void set_airdrop_location(Prover &p, Verifier &v, int xl, int yl, int zl, int RR) {
   p.pubi.xl = xl;
   v.pubi.xl = xl;
   p.pubi.yl = yl;
   v.pubi.yl = yl;
   p.pubi.zl = zl;
   v.pubi.zl = zl;
+  p.pubi.d2 = RR;
+  v.pubi.d2 = RR;
+}
+
+long distance_meters(double latoriginrad, double longoriginrad, double latdestrad, double longdestrad){
+  double HalfPi = 1.5707963;
+  double R = 3956000; /* the radius gives you the measurement unit*/
+
+  double a = HalfPi - latoriginrad;
+  double b = HalfPi - latdestrad;
+  double u = a * a + b * b;
+  double v = - 2 * a * b * cos(longdestrad - longoriginrad);
+  double c = sqrt(abs(u + v));
+  return (long) (R * c);
 }
 
 long get_airdrop_radius(Prover &p, Verifier &v) {
+  //std::cout << "d2"
+
   p.privi.a[0] = 0;
   p.privi.a[1] = 3;
   p.privi.a[2] = 1;
@@ -340,13 +359,42 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
     (p.privi.y - p.pubi.yl) * (p.privi.y - p.pubi.yl) +
     (p.privi.z - p.pubi.zl) * (p.privi.z - p.pubi.zl);
 
+  CryptoPP::Integer d3;
+  d3=d2.SquareRoot();
+
   for(int j=0; j<4; j++) {
     d2 += p.privi.a[j] * p.privi.a[j];
   };
 
   p.pubi.d2 = d2;
   v.pubi.d2 = d2;
+  std::cout << "d2" << d2 << std::endl << std::endl;
+  //std::cout << "d3" << d3 << std::endl << std::endl;
+  //std::cin.get();
   return d2.ConvertToLong();
+}
+
+void ClearScreen(){
+  if (!cur_term)
+    {
+    int result;
+    setupterm( NULL, STDOUT_FILENO, &result );
+    if (result <= 0) return;
+    }
+
+  putp( tigetstr( "clear" ) );
+  }
+
+void pauseLines(int linesOfEndl){
+  std::cout << "Pause" ;
+  #ifdef ENABLE_PAUSE
+    for(int i=0;i<0;i++){
+      std::cout << std::endl;
+    }
+    std::cin.get();
+    ClearScreen();
+    std::cout << std::endl << std::endl;
+  #endif
 }
 
 int main() {
@@ -364,15 +412,15 @@ int main() {
   P.pp = Prm;
   V.pp = Prm;
 
-  std::cout << "Pause" << std::endl << std::endl;
-  #ifdef ENABLE_PAUSE
-    std::cin.get();
-  #endif
-  std::cout << std::endl;
-  int xl=3, yl=4, zl=5, RR;  // center
+  pauseLines(18);
+  //ZUG
+  int xl=471666, yl=85166, zl=425, RR=10000;
+
+  //int xl=3, yl=4, zl=5, RR;  // center
   std::cout << "** Platin Airdrop Request **"  << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), radius (R), currency (BTC,ETH), Amount."  << std::endl <<
-               "Example: 3,4,5, 70, BTC,1.0" << std::endl;
+               //"Example: 3,4,5, 70, BTC,1.0" <<
+               std::endl;
   /*
   std::cout << "Enter XL: ";
   std::cin >> xl;
@@ -383,18 +431,14 @@ int main() {
   std::cout << "Enter R: ";
   std::cin >> RR;
   */
-  std::cout << " Now XL = " << xl << " YL = " << yl << " ZL = " << zl << std::endl;
-  set_airdrop_location(P, V, xl, yl, zl);
-  std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << std::endl;
+  //std::cout << " Now XL = " << xl << " YL = " << yl << " ZL = " << zl << std::endl;
+  set_airdrop_location(P, V, xl, yl, zl, RR);
+  std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << " Amount: 1.2 ETH" << std::endl;
 
-  std::cout << "Pause" << std::endl << std::endl;
-  std::cout << std::endl;
-  #ifdef ENABLE_PAUSE
-    std::cin >> RR;
-    std::cin.get();
-  #endif
-  int xn=2, yn=1, zn=3;  // node location
-  std::cout << "** Platin Pocket Teleport Request **" << std::endl <<
+  pauseLines(6);
+  //int xn=2, yn=1, =3;  // node location
+  int xn=473542, yn=86321, zn=460;
+  std::cout << "** Platin Test Pocket **" << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), pocket_address\n Example: 2,1,3,UUID" << std::endl;
   /*
   std::cout << "Enter XN: ";
@@ -404,14 +448,11 @@ int main() {
   std::cout << "Enter ZN: ";
   std::cin >> zn;
   */
-  std::cout << " Now XN = " << xn << " YN = " << yn << " ZN = " << zn << std::endl;
+  //std::cout << " Pocket XN = " << xn << " YN = " << yn << " ZN = " << zn << std::endl;
   set_node_location(P, V, xn, yn, zn);
   std::cout << "Pocket location " << xn << ", " << yn << ", " << zn << std::endl;
 
-  std::cout << "Pause" << std::endl << std::endl;
-  #ifdef ENABLE_PAUSE
-    std::cin.get();
-  #endif
+  pauseLines(6);
   std::cout << "** Platin Pocket Begin Location Claim **"  << std::endl <<
                "Producing zero knowledge commitment "  << std::endl <<
                "Sharing with Plexus" << std::endl;
@@ -425,10 +466,7 @@ int main() {
   V.ic = P.ic;  // P -> V
   Print_start(V);
 
-  std::cout << "Pause" << std::endl << std::endl;
-  #ifdef ENABLE_PAUSE
-    std::cin.get();
-  #endif
+  pauseLines(6);
   std::cout << "** Plexus Policy: Zero Knowledge Location Commitment Received **"  << std::endl <<
                "Generating Random Challenge"  << std::endl <<
                "Sharing with Plexus" << std::endl;
@@ -437,10 +475,7 @@ int main() {
   std::cout << "Challenge " // << std::endl
             << V.c << std::endl;
 
-  std::cout << "Pause" << std::endl << std::endl;
-  #ifdef ENABLE_PAUSE
-    std::cin.get();
-  #endif
+  pauseLines(6);
 
   std::cout << std::endl;
   std::cout << "** Platin Pocket: Challenge Received **"  << std::endl <<
@@ -450,19 +485,18 @@ int main() {
   V.rsp = P.rsp;  // P -> V
   Print_responses(V);
 
-  std::cout << "Pause" << std::endl << std::endl;
-  #ifdef ENABLE_PAUSE
-    std::cin.get();
-  #endif
+  pauseLines(6);
   std::cout << std::endl;
   std::cout << "** Plexus Policy: Challenge Response Received *"  << std::endl <<
-               "Calculate zero knowledge protocol - location blinded"  << std::endl <<
-               "Return true or false" << std::endl;
+               "Calculating zero knowledge protocol - location blinded..."  << std::endl <<
+               "Returning SUCCEED or FAILED";
+
+  pauseLines(6);
   isok = V.step_verify();
   if(isok)
-    std::cout << "Proof verified OK" << std::endl;
+    std::cout << "**Proof verification SUCCEED**" << std::endl << std::endl << std::endl;
   else
-    std::cout << "Proof verified WRONG" << std::endl;
+    std::cout << "**Proof verification FAILED**" << std::endl << std::endl << std::endl;
 
   return 0;
 }
