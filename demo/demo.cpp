@@ -15,6 +15,21 @@
 
 //#define ENABLE_PAUSE
 
+class Geocoord {
+public:
+  void set_origin_DD(double lat, double lon, double elv) {org_latitude = lat; org_longitude = lon; org_elevation = elv; };
+  void set_coords_DD(double lat, double lon, double elv) {c_latitude = lat, c_longitude = lon, c_elevation = elv; };
+
+  double get_coord_x(void);  // in meters, from origin
+  double get_coord_y(void);
+  double get_coord_z(void);
+
+  double R(void) { return 6371000.; }; // Earth radius, meters
+private:
+  double c_latitude, c_longitude, c_elevation, // location
+   org_latitude, org_longitude, org_elevation; // origin
+};
+
 class Parameters {
 public:
 //private:
@@ -392,6 +407,14 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
   return d2.ConvertToLong();
 }
 
+double Geocoord::get_coord_x(void) {return 0;} ;
+double Geocoord::get_coord_y(void) {return 0;} ;
+double Geocoord::get_coord_z(void) {return 0;} ;
+/*
+  double R(void) { return 6371000.; }; // Earth radius, meters
+  double c_latitude, c_longitude, c_elevation, // location
+   org_latitude, org_longitude, org_elevation; // origin
+*/
 void ClearScreen(){
   if (!cur_term)
     {
@@ -417,6 +440,7 @@ void pauseLines(int linesOfEndl){
 
 int main() {
   ClearScreen();
+  Geocoord gcs;
   Parameters Prm;
   Prover P;
   Verifier V;
@@ -435,7 +459,8 @@ int main() {
   //ZUG
   // xl = 47.1666 (grad lalitute) yn = 8.6166 (grad longtitude), zn = 1000 (meters)
   // RR = RADIUS OF Airdrop (10000 METERS)
-  int xl=471666, yl=86166, zl=1000, RR=10000;
+  double xl=47.1666, yl=8.6166, zl=1000.;
+  long RR=10000;
   std::cout << "** Platin Airdrop Request **"  << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), radius (R), currency (BTC,ETH), Amount."  << std::endl <<
                //"Example: 3,4,5, 70, BTC,1.0" <<
@@ -451,12 +476,13 @@ int main() {
   std::cin >> RR;
   */
   //std::cout << " Now XL = " << xl << " YL = " << yl << " ZL = " << zl << std::endl;
-  set_airdrop_location(P, V, xl, yl, zl, RR);
+  gcs.set_origin_DD(xl, yl, zl);
+  set_airdrop_location(P, V, 0, 0, 0, RR);
   std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << " Amount: 1.2 ETH" << std::endl;
 
   pauseLines(6);
   // xn = 47.1666 (grad lalitute) yn = 8.5161 (grad longtitude), zn = 425 (meters)
-  int xn=471666, yn=85161, zn=425;
+  double xn=47.1666, yn=8.5161, zn=425.;
   std::cout << "** Platin Test Pocket **" << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), pocket_address\n Example: 2,1,3,UUID" << std::endl;
   /*
@@ -468,8 +494,10 @@ int main() {
   std::cin >> zn;
   */
   //std::cout << " Pocket XN = " << xn << " YN = " << yn << " ZN = " << zn << std::endl;
-  set_node_location(P, V, xn, yn, zn);
-  std::cout << "Pocket location " << xn << ", " << yn << ", " << zn << std::endl;
+  gcs.set_coords_DD(xn, yn, zn);
+  set_node_location(P, V, gcs.get_coord_x(), gcs.get_coord_y(), gcs.get_coord_z());
+  std::cout << "Pocket location (degrees) " << xn << ", " << yn << ", " << zn << std::endl;
+  std::cout << "(meters) " << gcs.get_coord_x() << ", " << gcs.get_coord_y() << ", " << gcs.get_coord_z() << std::endl;
 
   pauseLines(6);
   std::cout << "** Platin Pocket Begin Location Claim **"  << std::endl <<
