@@ -13,7 +13,7 @@
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
 
-#define ENABLE_PAUSE
+//#define ENABLE_PAUSE
 
 class Parameters {
 public:
@@ -31,8 +31,9 @@ public:
   void set_center(int x, int y, int z);
   int get_radius_sq();  // temporary, to be replaced with Rabin-Shallit
 //private:
+  long radius; // requested radius
   CryptoPP::Integer xl, yl, zl,
-    d2;  // threshold for distance, squared
+    d2;  // threshold for distance (radius), squared, actual
   CryptoPP::Integer su; // commitment to node_location
 };
 
@@ -329,11 +330,18 @@ void set_airdrop_location(Prover &p, Verifier &v, int xl, int yl, int zl, int RR
   v.pubi.yl = yl;
   p.pubi.zl = zl;
   v.pubi.zl = zl;
-  p.pubi.d2 = RR;
-  v.pubi.d2 = RR;
+  p.pubi.radius = RR;
+  v.pubi.radius = RR;
 }
 
 long distance_meters(double latoriginrad, double longoriginrad, double latdestrad, double longdestrad){
+  double gradToRad=0.0175;
+  latoriginrad=latoriginrad*gradToRad;
+  longoriginrad=longoriginrad*gradToRad;
+  latdestrad=latdestrad*gradToRad;
+  longdestrad=longdestrad*gradToRad;
+  //std::cout << "latoriginrad " << latoriginrad << std::endl;
+  //std::cout << "longoriginrad " << longoriginrad << std::endl;
   double HalfPi = 1.5707963;
   double R = 3956000; /* the radius gives you the measurement unit*/
 
@@ -346,31 +354,41 @@ long distance_meters(double latoriginrad, double longoriginrad, double latdestra
 }
 
 long get_airdrop_radius(Prover &p, Verifier &v) {
-  //std::cout << "d2"
-
-  p.privi.a[0] = 0;
-  p.privi.a[1] = 3;
-  p.privi.a[2] = 1;
-  p.privi.a[3] = 4;
-
-  CryptoPP::Integer d2;
-  d2 =
+  long dist_ln, diff_dist, approx;
+  CryptoPP::Integer d2 =
     (p.privi.x - p.pubi.xl) * (p.privi.x - p.pubi.xl) +
     (p.privi.y - p.pubi.yl) * (p.privi.y - p.pubi.yl) +
     (p.privi.z - p.pubi.zl) * (p.privi.z - p.pubi.zl);
+  dist_ln = d2.ConvertToLong();
+  diff_dist = p.pubi.radius * p.pubi.radius - dist_ln;
 
-  CryptoPP::Integer d3;
-  d3=d2.SquareRoot();
+  //  d2 = 0;  // debug
+  //  diff_dist = 197*197 + 12*12 + 3*3 + 2; // 38964
 
+  if(diff_dist < 0) {
+    std::cout << "**Proof verification FAILED**" << std::endl;
+    return -1;
+  }
+
+  for(int j=0; j<4; j++) {  // calculate_A1_A2_A3_A4()
+    approx = sqrt(diff_dist); // approximation by rounding while assigning to integer
+    p.privi.a[j] = approx;
+    diff_dist -= approx * approx;
+    std::cout << approx << std::endl;
+  }
+
+  std::cout << "distance squared " << d2 << std::endl << std::endl;
   for(int j=0; j<4; j++) {
     d2 += p.privi.a[j] * p.privi.a[j];
   };
 
+  std::cout << "Recalculated d2 " << d2 << std::endl << std::endl;
+  std::cout << "Original d2 " << (p.pubi.radius * p.pubi.radius) << std::endl << std::endl;
+  //  std::cout << "radius squared " << d2 << std::endl << std::endl;
   p.pubi.d2 = d2;
   v.pubi.d2 = d2;
-  std::cout << "d2" << d2 << std::endl << std::endl;
-  //std::cout << "d3" << d3 << std::endl << std::endl;
-  //std::cin.get();
+  std::cout << "Hit ENTER to continue... " << std::endl;
+  std::cin.get();
   return d2.ConvertToLong();
 }
 
@@ -398,6 +416,7 @@ void pauseLines(int linesOfEndl){
 }
 
 int main() {
+  ClearScreen();
   Parameters Prm;
   Prover P;
   Verifier V;
@@ -414,9 +433,9 @@ int main() {
 
   pauseLines(18);
   //ZUG
-  int xl=471666, yl=85166, zl=425, RR=10000;
-
-  //int xl=3, yl=4, zl=5, RR;  // center
+  // xl = 47.1666 (grad lalitute) yn = 8.6166 (grad longtitude), zn = 1000 (meters)
+  // RR = RADIUS OF Airdrop (10000 METERS)
+  int xl=471666, yl=86166, zl=1000, RR=10000;
   std::cout << "** Platin Airdrop Request **"  << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), radius (R), currency (BTC,ETH), Amount."  << std::endl <<
                //"Example: 3,4,5, 70, BTC,1.0" <<
@@ -436,8 +455,8 @@ int main() {
   std::cout << "Airdrop location " << xl << ", " << yl << ", " << zl << " Amount: 1.2 ETH" << std::endl;
 
   pauseLines(6);
-  //int xn=2, yn=1, =3;  // node location
-  int xn=473542, yn=86321, zn=460;
+  // xn = 47.1666 (grad lalitute) yn = 8.5161 (grad longtitude), zn = 425 (meters)
+  int xn=471666, yn=85161, zn=425;
   std::cout << "** Platin Test Pocket **" << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), pocket_address\n Example: 2,1,3,UUID" << std::endl;
   /*
@@ -458,9 +477,11 @@ int main() {
                "Sharing with Plexus" << std::endl;
   //  PrintCommitment("Pocket location commitment s_U", V.pubi.su);
 
-  int d2;  // radius squared
-  d2 = get_airdrop_radius(P, V);  // will be set_radius()
-  std::cout << "Radius-squared " << d2 << std::endl;
+  long radius_actual;  // radius after approximation
+  radius_actual = sqrt(get_airdrop_radius(P, V));  // approximate and calculate "more" witness
+  std::cout << "Radius re-calculated " << radius_actual << std::endl;
+
+  return 0;
 
   P.step_start(randPool);
   V.ic = P.ic;  // P -> V
@@ -489,7 +510,7 @@ int main() {
   std::cout << std::endl;
   std::cout << "** Plexus Policy: Challenge Response Received *"  << std::endl <<
                "Calculating zero knowledge protocol - location blinded..."  << std::endl <<
-               "Returning SUCCEED or FAILED";
+               "Returning SUCCEED or FAILED" << std::endl;
 
   pauseLines(6);
   isok = V.step_verify();
