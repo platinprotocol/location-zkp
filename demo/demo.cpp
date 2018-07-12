@@ -28,6 +28,7 @@ public:
 private:
   double c_latitude, c_longitude, c_elevation, // location
    org_latitude, org_longitude, org_elevation; // origin
+  double gradToRad(void) { return 0.0175; };
 };
 
 class Parameters {
@@ -407,14 +408,10 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
   return d2.ConvertToLong();
 }
 
-double Geocoord::get_coord_x(void) {return 0;} ;
-double Geocoord::get_coord_y(void) {return 0;} ;
-double Geocoord::get_coord_z(void) {return 0;} ;
-/*
-  double R(void) { return 6371000.; }; // Earth radius, meters
-  double c_latitude, c_longitude, c_elevation, // location
-   org_latitude, org_longitude, org_elevation; // origin
-*/
+double Geocoord::get_coord_x(void) {return R() * gradToRad() * (c_latitude - org_latitude); }; // (node - airdrop); X direction is to south pole, 
+double Geocoord::get_coord_y(void) {return R() * gradToRad() * (c_longitude - org_longitude) * abs(cos(gradToRad() * org_latitude)); };  // Y is to Greenwich
+double Geocoord::get_coord_z(void) {return (c_elevation - org_elevation);} ;  // Z is up
+
 void ClearScreen(){
   if (!cur_term)
     {
