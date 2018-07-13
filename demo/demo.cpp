@@ -13,7 +13,15 @@
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
 
-//#define ENABLE_PAUSE
+#define ENABLE_PAUSE
+
+//#define DBG_NCOMM
+//#define DBG_ACOMM
+//#define DBG_LOCCOMM
+//#define DBG_CHALL0
+//#define DBG_CHALL1
+
+#define DBG_LOCATIONS
 
 class Geocoord {
 public:
@@ -131,7 +139,11 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
              pp.group.Multiply(
 		pp.group.Exponentiate(pp.gz, z),
                 pp.group.Exponentiate(pp.gr, r))));
-  // should be like  group.Add(a, group.Add(b, group.Add(c,d))
+
+#ifdef DBG_LOCCOMM
+  std::cout << "x " << x << " y " << y << " z " << z << " r " << r << std::endl;
+  std::cout << "location comm " << s << std::endl;
+#endif
   return s;
 }
 
@@ -142,10 +154,13 @@ CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Intege
     //    std::cout << s <<  " _ ";
     t = pp.group.Multiply(s, pp.group.Exponentiate(pp.h[j], a[j]));
     s = t;
-    //    std::cout << a[j] << " " << t <<  " | ";
+#ifdef DBG_ACOMM
+    std::cout << a[j] << " " << t <<  " | ";
+#endif
   }
-  //  std::cout << std::endl;
-
+#ifdef DBG_ACOMM
+  std::cout << std::endl << "a4 commitment " << s << std::endl;
+#endif
   return s;
 }
 
@@ -155,24 +170,18 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
   if(f < 0) {
     s = pp.group.Exponentiate(pp.g, -f);
     t = pp.group.MultiplicativeInverse(s);
-/*
-  std::cout << "-f " << -f << std::endl;
-  std::cout << "exp(-f) " << pp.group.Exponentiate(pp.g, -f) << std::endl;
-  std::cout << "t=minv " << t << std::endl;
-*/
   } else {
    t = pp.group.Exponentiate(pp.g, f);
   }
-  //  return t;
 
   s = pp.group.Multiply(t,
         pp.group.Exponentiate(pp.gr, rho));
-/*
+#ifdef DBG_NCOMM
   std::cout << "f " << f << std::endl;
   std::cout << "rho " << rho << std::endl;
   std::cout << "exp(f) " << t << std::endl;
   std::cout << "comm   " << s << std::endl;
-*/
+#endif
   return s;
 }
 
@@ -187,17 +196,19 @@ bool Verifier::step_verify() {
        pp.group.MultiplicativeInverse(
          pp.group.Exponentiate(pubi.su, c)))
      !=
-     ic.t_n)
+     ic.t_n) {
+    std::cout << "Trap-location" << std::endl;
     return false;
-
+  }
   if(pp.group.Multiply(
        CreateACommitment(pp, rsp.R_a, rsp.A),
        pp.group.MultiplicativeInverse(
          pp.group.Exponentiate(ic.sa, c)))
      !=
-     ic.t_a)
+     ic.t_a) {
+    std::cout << "Trap-squares" << std::endl;
     return false;
-
+  }
   CryptoPP::Integer pwr = c * c * pubi.d2 - (
     (rsp.Xn - c * pubi.xl)*(rsp.Xn - c * pubi.xl) +
     (rsp.Yn - c * pubi.yl)*(rsp.Yn - c * pubi.yl) +
@@ -210,7 +221,7 @@ bool Verifier::step_verify() {
      pp.group.Multiply(
        pp.group.Exponentiate(ic.b_1, c),
        ic.b_0)) {
-    std::cout << "Trap" << std::endl;
+    std::cout << "Trap-radius" << std::endl;
     return false;
   }
 
@@ -218,6 +229,14 @@ bool Verifier::step_verify() {
 }
 
 void Verifier::step_challenge(CryptoPP::RandomNumberGenerator &rng) {
+#ifdef DBG_CHALL0
+  c = 0;
+  return;
+#endif
+#ifdef DBG_CHALL1
+  c = 1;
+  return;
+#endif
   c = CryptoPP::Integer(rng, pp.rnd_bitsize_chall);
 }
 
@@ -227,13 +246,24 @@ void Prover::step_start(CryptoPP::RandomNumberGenerator &rng) {
 
   privpf.eta = rnd_commitment(pp, rng);
   for(int j=0; j<4; j++)
+#ifdef DBG_CHALL1
+    privpf.alpha[j] = 0;
+#else
     privpf.alpha[j] = rnd_commitment(pp, rng);
+#endif
   ic.t_a = CreateACommitment(pp, privpf.eta, privpf.alpha);
 
+#ifdef DBG_CHALL1
+  privpf.beta_x = 0;
+  privpf.beta_y = 0;
+  privpf.beta_z = 0;
+  privpf.beta_r = 0;
+#else
   privpf.beta_x = rnd_commitment(pp, rng);
   privpf.beta_y = rnd_commitment(pp, rng);
   privpf.beta_z = rnd_commitment(pp, rng);
   privpf.beta_r = rnd_commitment(pp, rng);
+#endif
   ic.t_n = CreateCommitment(pp, privpf.beta_x, privpf.beta_y, privpf.beta_z, privpf.beta_r);
 
   privpf.f_0 = -(privpf.beta_x * privpf.beta_x + privpf.beta_y * privpf.beta_y + privpf.beta_z * privpf.beta_z);
@@ -266,9 +296,9 @@ void Prover::step_responses() {
 
 void SetParameters(Parameters &pp, CryptoPP::RandomNumberGenerator &rng) {
   pp.rnd_bitsize_modulus = 2048;
-  pp.rnd_bitsize_commitment = 20; // 200;
-  pp.rnd_bitsize_chall = 100;
-  pp.rnd_offset_chall = 100;
+  pp.rnd_bitsize_commitment = 200;
+  pp.rnd_bitsize_chall = 50;
+  pp.rnd_offset_chall = 150;
 
   CryptoPP::InvertibleRSAFunction pv;
   pv.Initialize(rng, pp.rnd_bitsize_modulus, 3);
@@ -337,6 +367,9 @@ void set_node_location(Prover &p, Verifier &v, const int xn, const int yn, const
   scomm = CreateCommitment(p.pp, p.privi.x, p.privi.y, p.privi.z, p.privi.r);
   p.pubi.su = scomm;
   v.pubi.su = scomm;
+#ifdef DBG_LOCATIONS
+  std::cout << "set node Xn " << xn << " Yn " << yn << " Zn " << zn << std::endl;
+#endif
 }
 
 void set_airdrop_location(Prover &p, Verifier &v, int xl, int yl, int zl, int RR) {
@@ -409,7 +442,7 @@ long get_airdrop_radius(Prover &p, Verifier &v) {
 }
 
 double Geocoord::get_coord_x(void) {return R() * gradToRad() * (c_latitude - org_latitude); }; // (node - airdrop); X direction is to south pole, 
-double Geocoord::get_coord_y(void) {return R() * gradToRad() * (c_longitude - org_longitude) * abs(cos(gradToRad() * org_latitude)); };  // Y is to Greenwich
+double Geocoord::get_coord_y(void) {return R() * gradToRad() * (org_longitude - c_longitude) * cos(gradToRad() * org_latitude); };  // Y is to Greenwich
 double Geocoord::get_coord_z(void) {return (c_elevation - org_elevation);} ;  // Z is up
 
 void ClearScreen(){
@@ -456,7 +489,7 @@ int main() {
   //ZUG
   // xl = 47.1666 (grad lalitute) yn = 8.6166 (grad longtitude), zn = 1000 (meters)
   // RR = RADIUS OF Airdrop (10000 METERS)
-  double xl=47.1666, yl=8.6166, zl=1000.;
+  double xl=47.1666, yl=8.6166, zl=100.;
   long RR=10000;
   std::cout << "** Platin Airdrop Request **"  << std::endl <<
                "Format: Lat/Long coordinates (x,y,z), radius (R), currency (BTC,ETH), Amount."  << std::endl <<
@@ -498,7 +531,7 @@ int main() {
 
   pauseLines(6);
   std::cout << "** Platin Pocket Begin Location Claim **"  << std::endl <<
-               "Producing zero knowledge commitment "  << std::endl <<
+               "Producing commitment "  << std::endl <<
                "Sharing with Plexus" << std::endl;
   //  PrintCommitment("Pocket location commitment s_U", V.pubi.su);
 
@@ -506,14 +539,12 @@ int main() {
   radius_actual = sqrt(get_airdrop_radius(P, V));  // approximate and calculate "more" witness
   std::cout << "Radius re-calculated " << radius_actual << std::endl;
 
-  return 0;
-
   P.step_start(randPool);
   V.ic = P.ic;  // P -> V
   Print_start(V);
 
   pauseLines(6);
-  std::cout << "** Plexus Policy: Zero Knowledge Location Commitment Received **"  << std::endl <<
+  std::cout << "** Plexus Policy: Location Commitment Received **"  << std::endl <<
                "Generating Random Challenge"  << std::endl <<
                "Sharing with Plexus" << std::endl;
   V.step_challenge(randPool);
@@ -533,8 +564,8 @@ int main() {
 
   pauseLines(6);
   std::cout << std::endl;
-  std::cout << "** Plexus Policy: Challenge Response Received *"  << std::endl <<
-               "Calculating zero knowledge protocol - location blinded..."  << std::endl <<
+  std::cout << "** Plexus Policy: Response Received *"  << std::endl <<
+               "Verification step of the protocol, location is hidden..."  << std::endl <<
                "Returning SUCCEED or FAILED" << std::endl;
 
   pauseLines(6);
