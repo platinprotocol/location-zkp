@@ -1,5 +1,6 @@
 /* Platin.io 2018
  * written by Vadym Fedyukovych
+ * "approximate" 4-squares initial implementation by Mykhailo Tiutin
  *
  * "Location is close enough" interactive proof implementation
  * described at "Private location verification"
@@ -13,7 +14,7 @@
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
 
-#define ENABLE_PAUSE
+//#define ENABLE_PAUSE
 
 //#define DBG_NCOMM
 //#define DBG_ACOMM
@@ -21,7 +22,8 @@
 //#define DBG_CHALL0
 //#define DBG_CHALL1
 
-#define DBG_LOCATIONS
+//#define DBG_LOCATIONS
+#define DBG_NEGEXP
 
 class Geocoord {
 public:
@@ -129,9 +131,31 @@ CryptoPP::Integer rnd_commitment(const Parameters &pp, CryptoPP::RandomNumberGen
   return CryptoPP::Integer(rng, pp.rnd_bitsize_commitment);
 }
 
+CryptoPP::Integer neg_a_exp_b_mod_c(const CryptoPP::Integer& a, const CryptoPP::Integer& b, const CryptoPP::ModularArithmetic& c) {
+  CryptoPP::Integer interm, result;
+
+  if(b < 0) {
+    interm = c.Exponentiate(a, -b);
+    result = c.MultiplicativeInverse(interm);
+  } else {
+    result = c.Exponentiate(a, b);
+    interm = c.MultiplicativeInverse(result);
+  }
+  return result;
+}
+
 CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer x, const CryptoPP::Integer y, const CryptoPP::Integer z, const CryptoPP::Integer r) {
   CryptoPP::Integer s;
 
+#ifdef DBG_NEGEXP
+  s = pp.group.Multiply(
+          neg_a_exp_b_mod_c(pp.gx, x, pp.group),
+          pp.group.Multiply(
+             neg_a_exp_b_mod_c(pp.gy, y, pp.group),
+             pp.group.Multiply(
+                neg_a_exp_b_mod_c(pp.gz, z, pp.gz),
+                neg_a_exp_b_mod_c(pp.gr, r, pp.group))));
+#else
   s = pp.group.Multiply(
 	  pp.group.Exponentiate(pp.gx, x),
 	  pp.group.Multiply(
@@ -139,6 +163,7 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
              pp.group.Multiply(
 		pp.group.Exponentiate(pp.gz, z),
                 pp.group.Exponentiate(pp.gr, r))));
+#endif
 
 #ifdef DBG_LOCCOMM
   std::cout << "x " << x << " y " << y << " z " << z << " r " << r << std::endl;
@@ -166,16 +191,23 @@ CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Intege
 
 CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Integer f, const CryptoPP::Integer rho) {
   CryptoPP::Integer s, t;
-
+#ifdef DBG_NEGEXP
+  t = neg_a_exp_b_mod_c(pp.g, f, pp.group);
+#else
   if(f < 0) {
     s = pp.group.Exponentiate(pp.g, -f);
     t = pp.group.MultiplicativeInverse(s);
   } else {
-   t = pp.group.Exponentiate(pp.g, f);
+    t = pp.group.Exponentiate(pp.g, f);
   }
-
+#endif
   s = pp.group.Multiply(t,
+#ifdef DBG_NEGEXP
+        neg_a_exp_b_mod_c(pp.gr, rho, pp.group));
+#else
         pp.group.Exponentiate(pp.gr, rho));
+#endif
+
 #ifdef DBG_NCOMM
   std::cout << "f " << f << std::endl;
   std::cout << "rho " << rho << std::endl;
