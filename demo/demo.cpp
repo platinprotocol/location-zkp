@@ -223,8 +223,11 @@ void PrintCommitment(const std::string title, const CryptoPP::Integer comm) {
 }
 
 bool Verifier::step_verify() {
+
+  CryptoPP::Integer var1 = CreateCommitment(pp, rsp.Xn, rsp.Yn, rsp.Zn, rsp.R);
+
   if(pp.group.Multiply(
-       CreateCommitment(pp, rsp.Xn, rsp.Yn, rsp.Zn, rsp.R),
+       var1,
        pp.group.MultiplicativeInverse(
          pp.group.Exponentiate(pubi.su, c)))
      !=
@@ -232,8 +235,11 @@ bool Verifier::step_verify() {
     std::cout << "Trap-location" << std::endl;
     return false;
   }
+
+  CryptoPP::Integer var2 = CreateACommitment(pp, rsp.R_a, rsp.A);
+
   if(pp.group.Multiply(
-       CreateACommitment(pp, rsp.R_a, rsp.A),
+       var2,
        pp.group.MultiplicativeInverse(
          pp.group.Exponentiate(ic.sa, c)))
      !=
