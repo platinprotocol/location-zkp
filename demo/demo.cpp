@@ -14,7 +14,7 @@
 #include "cryptopp/rsa.h"
 #include "cryptopp/randpool.h"
 
-//#define ENABLE_PAUSE
+#define ENABLE_PAUSE
 
 //#define DBG_NCOMM
 //#define DBG_ACOMM
