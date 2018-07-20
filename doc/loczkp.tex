@@ -381,6 +381,29 @@ to account for project ideas other than location proofs,
 and for implementation-level needs.
 Location security policy apply for original data and commitment random input.
 
+\section{Proving Inside a polygon}
+
+Consider an area defined by a polygon serving as it's border,
+and proof systems for ``inside'' and ``outside'' statements.
+We design ``Inside'' proof as an AND of the node location $\vec l = (x_n, y_n)$ to the right side of the plane (line in 2D),
+for all lines of the polygon.
+We define proper side with normale vector $\vec n = (n_x, n_y)$ to the border, scalar product, and with proper distance $d$ from the origin:
+\begin{gather}
+  (\vec l \vec n) \ge d
+\end{gather}
+As with simple ``circle'' case, any non-negative integer could be represented at a sum of 4 squares,
+and this inequality can be proved for all lines (indexed by $j$) of the polygon border:
+\begin{gather}
+  x_n n_{x,j} + y_n n_{y,j} - d_j = a_{1,j}^2 + a_{2,j}^2 + a_{3,j}^2 + a_{4,j}^2
+\end{gather}
+This proof can be given both for known polygon, and for hidden polygon available as a commitment while verification.
+For known polygon case, challenge $c$ and responses $X_n, Y_n, A_{1,j}, A_{2,j}, A_{3,j}, A_{4,j}$
+we have a replacement equation:
+\begin{gather}
+  g^{Y_n c n_{x,j} + Y_n c n_{y,j} - c^2 d_j - (A_{1,j}^2 + A_{2,j}^2 + A_{3,j}^2 + A_{4,j}^2)} = b_{1,j}^c b_{0,j}
+\end{gather}
+with $b_1, b_0$ defined at the first step of the protocol.
+
 %\begin{enumerate}
 %\item
 %  Appl
