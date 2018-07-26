@@ -391,7 +391,7 @@ We define proper side with normale vector $\vec n = (n_x, n_y)$ to the border, s
 \begin{gather}
   (\vec l \vec n) \ge d
 \end{gather}
-As with simple ``circle'' case, any non-negative integer could be represented at a sum of 4 squares,
+As with simple ``circle'' case, any non-negative integer could be represented as a sum of 4 squares,
 and this inequality can be proved for all lines (indexed by $j$) of the polygon border:
 \begin{gather}
   x_n n_{x,j} + y_n n_{y,j} - d_j = a_{1,j}^2 + a_{2,j}^2 + a_{3,j}^2 + a_{4,j}^2
@@ -403,6 +403,16 @@ we have a replacement equation:
   g^{Y_n c n_{x,j} + Y_n c n_{y,j} - c^2 d_j - (A_{1,j}^2 + A_{2,j}^2 + A_{3,j}^2 + A_{4,j}^2)} = b_{1,j}^c b_{0,j}
 \end{gather}
 with $b_1, b_0$ defined at the first step of the protocol.
+
+\subsection{Hidden area/polygon}
+
+Conside a case of polygon kept private, and only available as commitment.
+We extend the proof from previous section
+by replacing known normale vector and distance with responses $N_{x,j}, N_{y,j}, D_j$:
+\begin{gather}
+  g^{Y_n N_{x,j} + Y_n N_{y,j} - c D_j - (A_{1,j}^2 + A_{2,j}^2 + A_{3,j}^2 + A_{4,j}^2)} = b_{1,j}^c b_{0,j}
+\end{gather}
+with corresponding (alternative) $b_1, b_0$.
 
 %\begin{enumerate}
 %\item
