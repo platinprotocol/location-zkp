@@ -3,11 +3,11 @@ CRYPTOPP = ..
 CFLAGS += -I$(CRYPTOPP)
 LIBS = -L$(CRYPTOPP)/cryptopp  -lcryptopp -lcurses
 
-all:	clean demo run
+all:	clean demoCircle run
 
-demo:	demo.o
+demoCircle:	demoCircle.o
 
-demo.o:	demo.cpp
+demoCircle.o:	demoCircle.cpp
 
 .cpp.o:
 	g++ -o $@ $(CFLAGS) -c $<
@@ -16,7 +16,7 @@ demo.o:	demo.cpp
 	g++ -o $@ $? $(LIBS)
 
 clean:
-	rm -rf ./demo ./demo.o
+	rm -rf ./demoCircle ./demoCircle.o
 
 run:
-	./demo
+	./demoCircle
