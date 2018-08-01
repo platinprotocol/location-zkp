@@ -414,6 +414,42 @@ by replacing known normale vector and distance with responses $N_{x,j}, N_{y,j},
 \end{gather}
 with corresponding (alternative) $b_1, b_0$.
 
+\section{Calculating the four-squares} % representation
+
+Most of protocols in this document were designed to prove 'inequality' statements (like 'more than') about integers.
+All such protocols are transformed into 'equality' by applying Lagrange theorem.
+It states that any non-negative integer can be presented as a sum of four squares.
+In other words, some four-tuple always exists for any non-negative integer.
+This is a well-known result in number theory.
+However, we need to actually calculate that four numbers to run an 'inequality'-type proof about integers.
+
+A compact concise description of a candidate algorithm is given at Enrique Trevino' presentation~\footnote{\url{http://campus.lakeforest.edu/trevino/JMM2018.pdf}}.
+Complexity estimates of Rabin-Shallit algorithm are given by Pollack-Trevino~\footnote{\url{http://campus.lakeforest.edu/trevino/finding4squares.pdf}}.
+% Finding the four squares in Lagrange's Theorem (presentation)
+% Finding the four squares in Lagrange's Theorem (article) Paul Pollack and Enrique Trevino
+\\
+Rabin-Shallit algorithm for finding 4-tuple is mentioned at Idemix specifications~\footnote{\url{http://domino.research.ibm.com/library/cyberdig.nsf/papers/EEB54FF3B91C1D648525759B004FBBB1/$File/rz3730_revised.pdf}}
+(section 6.2.6 Protocol ProveInequality, step 1.2)
+and ``[it] accounts for a substantial fraction of the computation time of this protocol''.
+% P. Schorn. Four squares. http://schorn.ch/lagrange.html. Accessed July 2008.
+% Michael O. Rabin and Jeffrey O. Shallit. Randomized algorithms in number theory. Commu- nications in pure and applied mathematics, 39:239–256, 1986.
+
+This algorithm requires some background, in particular quaternions (Hurwitz integers).
+Gaussian integers (a kind of complex numbers) are relevant as a simple object to start from.
+
+Comprehensive documents considered include
+Keith Conrad's overview~\footnote{\url{http://www.math.uconn.edu/~kconrad/blurbs/ugradnumthy/Zinotes.pdf}}
+and an article~\footnote{\url{https://www.sciencedirect.com/science/article/pii/S0747717101905188}}.
+%
+Yijian Liu' Master thesis~\footnote{\url{https://mspace.lib.umanitoba.ca/bitstream/handle/1993/32638/Yijian_Liu.pdf}} is considered helpful.
+%
+Entry-level reading include
+forum~\footnote{\url{http://mathforum.org/library/drmath/view/67068.html}}
+and stackoverflow~\footnote{\url{https://stackoverflow.com/questions/2269810/whats-a-nice-method-to-factor-gaussian-integers}}.
+
+Current intermediate target is extended Euclidean algorithm for quaternions, C++ implementation on top of Crypto++.
+Having it implemented, algorithm from Trevino presentation should be straightforward.
+
 %\begin{enumerate}
 %\item
 %  Appl
