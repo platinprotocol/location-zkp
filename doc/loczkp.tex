@@ -424,11 +424,16 @@ This is a well-known result in number theory.
 However, we need to actually calculate that four numbers to run an 'inequality'-type proof about integers.
 
 A compact concise description of a candidate algorithm is given at Enrique Trevino' presentation~\footnote{\url{http://campus.lakeforest.edu/trevino/JMM2018.pdf}}.
-Complexity estimates of Rabin-Shallit algorithm are given by Pollack-Trevino~\footnote{\url{http://campus.lakeforest.edu/trevino/finding4squares.pdf}}.
+Complexity estimates of Rabin-Shallit algorithm are given by Pollack-Trevino~\footnote{\url{http://campus.lakeforest.edu/trevino/finding4squares.pdf}},
+Pollack-Schorn~\footnote{\url{http://www.ams.org/journals/mcom/0000-000-00/S0025-5718-2018-03349-X/home.html}}
 % Finding the four squares in Lagrange's Theorem (presentation)
 % Finding the four squares in Lagrange's Theorem (article) Paul Pollack and Enrique Trevino
-\\
-Rabin-Shallit algorithm for finding 4-tuple is mentioned at Idemix specifications~\footnote{\url{http://domino.research.ibm.com/library/cyberdig.nsf/papers/EEB54FF3B91C1D648525759B004FBBB1/$File/rz3730_revised.pdf}}
+% Paul Pollack and Peter Schorn, Dirichlet's proof of the three-square theorem: An algorithmic perspective
+%
+% http://www.ams.org/journals/bull/1927-33-01/S0002-9904-1927-04312-9/
+% L. E. Dickson 1927  Integers represented by positive ternary quadratic forms
+
+Rabin-Shallit algorithm for finding 4-tuple is mentioned at Idemix specifications %~\footnote{\url{http://domino.research.ibm.com/library/cyberdig.nsf/papers/EEB54FF3B91C1D648525759B004FBBB1/$File/rz3730_revised.pdf}}
 (section 6.2.6 Protocol ProveInequality, step 1.2)
 and ``[it] accounts for a substantial fraction of the computation time of this protocol''.
 % P. Schorn. Four squares. http://schorn.ch/lagrange.html. Accessed July 2008.
@@ -449,6 +454,9 @@ and stackoverflow~\footnote{\url{https://stackoverflow.com/questions/2269810/wha
 
 Current intermediate target is extended Euclidean algorithm for quaternions, C++ implementation on top of Crypto++.
 Having it implemented, algorithm from Trevino presentation should be straightforward.
+
+'Final Algorithm' is shown on page 11, Trevino presentation.
+It includes calculation of greatest common divisors over Gaussian integers and quaternions.
 
 %\begin{enumerate}
 %\item
