@@ -223,42 +223,31 @@ void PrintCommitment(const std::string title, const CryptoPP::Integer comm) {
 }
 
 bool Verifier::step_verify() {
-
-  CryptoPP::Integer var1 = CreateCommitment(pp, rsp.Xn, rsp.Yn, rsp.Zn, rsp.R);
-
-  if(pp.group.Multiply(
-       var1,
-       pp.group.MultiplicativeInverse(
-         pp.group.Exponentiate(pubi.su, c)))
-     !=
-     ic.t_n) {
+  // section 14.1
+  CryptoPP::Integer loc_left_side = CreateCommitment(pp, rsp.Xn, rsp.Yn, rsp.Zn, rsp.R);
+  CryptoPP::Integer loc_right_side = pp.group.Multiply(ic.t_n, pp.group.Exponentiate(pubi.su, c));
+  if(loc_left_side != loc_right_side) {
     std::cout << "Trap-location" << std::endl;
     return false;
   }
 
-  CryptoPP::Integer var2 = CreateACommitment(pp, rsp.R_a, rsp.A);
-
-  if(pp.group.Multiply(
-       var2,
-       pp.group.MultiplicativeInverse(
-         pp.group.Exponentiate(ic.sa, c)))
-     !=
-     ic.t_a) {
+  CryptoPP::Integer diff_left_side = CreateACommitment(pp, rsp.R_a, rsp.A);
+  CryptoPP::Integer diff_right_side = pp.group.Multiply(ic.t_a, pp.group.Exponentiate(ic.sa, c));
+  if(diff_left_side != diff_right_side) {
     std::cout << "Trap-squares" << std::endl;
     return false;
   }
-  CryptoPP::Integer pwr = c * c * pubi.d2 - (
+
+  CryptoPP::Integer pwr =
     (rsp.Xn - c * pubi.xl)*(rsp.Xn - c * pubi.xl) +
     (rsp.Yn - c * pubi.yl)*(rsp.Yn - c * pubi.yl) +
-    (rsp.Zn - c * pubi.zl)*(rsp.Zn - c * pubi.zl));
+    (rsp.Zn - c * pubi.zl)*(rsp.Zn - c * pubi.zl);
   for(int j=0; j<4; j++)
-    pwr -= rsp.A[j] * rsp.A[j];
-
-  if(CreateNCommitment(pp, pwr, rsp.R_d)
-     !=
-     pp.group.Multiply(
-       pp.group.Exponentiate(ic.b_1, c),
-       ic.b_0)) {
+    pwr += rsp.A[j] * rsp.A[j];
+  pwr -= c * c * pubi.d2;
+  CryptoPP::Integer inside_left_side = CreateNCommitment(pp, pwr, rsp.R_d);
+  CryptoPP::Integer inside_right_side = pp.group.Multiply(pp.group.Exponentiate(ic.b_1, c), ic.b_0);
+  if(inside_left_side != inside_right_side) {
     std::cout << "Trap-radius" << std::endl;
     return false;
   }
@@ -304,19 +293,19 @@ void Prover::step_start(CryptoPP::RandomNumberGenerator &rng) {
 #endif
   ic.t_n = CreateCommitment(pp, privpf.beta_x, privpf.beta_y, privpf.beta_z, privpf.beta_r);
 
-  privpf.f_0 = -(privpf.beta_x * privpf.beta_x + privpf.beta_y * privpf.beta_y + privpf.beta_z * privpf.beta_z);
+  // section 14.1
+  privpf.f_0 = privpf.beta_x * privpf.beta_x + privpf.beta_y * privpf.beta_y + privpf.beta_z * privpf.beta_z;
   privpf.f_1 = (privi.x - pubi.xl)*privpf.beta_x + (privi.y - pubi.yl)*privpf.beta_y + (privi.z - pubi.zl)*privpf.beta_z;
 
   for(int j=0; j<4; j++) {
-    privpf.f_0 -= privpf.alpha[j] * privpf.alpha[j];
+    privpf.f_0 += privpf.alpha[j] * privpf.alpha[j];
     privpf.f_1 +=  privi.a[j] * privpf.alpha[j];
   }
-  privpf.f_1 *= -2;
   privpf.rho_0 = rnd_commitment(pp, rng);
   privpf.rho_1 = rnd_commitment(pp, rng);
 
   ic.b_0 = CreateNCommitment(pp, privpf.f_0, privpf.rho_0);
-  ic.b_1 = CreateNCommitment(pp, privpf.f_1, privpf.rho_1);
+  ic.b_1 = CreateNCommitment(pp, 2*privpf.f_1, privpf.rho_1);
 }
 
 void Prover::step_responses() {
