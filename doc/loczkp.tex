@@ -478,48 +478,140 @@ Two potential non-critical issues were identified on the roadmap to Solidity con
 avoiding negative integers in the exponent and
 non-interactive proofs with deterministic challenges (covered at section~\ref{FS_non_interactive}).
 
-\subsection{Alternative proof verification}
+%\subsection{Alternative proof verification}
 
-Verification equations~\eqref{verf-linear} and~\eqref{verf-distn} can be amended as follows:
+%Verification equations~\eqref{verf-linear} and~\eqref{verf-distn} can be amended.
+%With changes introduced, only non-negative exponents are expected
+%while verifying location statement,
+%and no randomness is introduced while verification.
+
+\subsection{Complete proof variant for Solidity}
+
+A non-interactive proof variant can be adopted for Solidity
+(no random numbers while verification),
+modified to expect only positive exponents.
+
+\begin{enumerate}
+\item
+  Prover calculates $a_1 \dots a_4$ from locations and threshold,
+  picks random $\alpha_j, \eta, \gamma, \beta_x, \beta_y, \beta_z, \beta_r, \rho_0, \rho_1$, %, \eta_x, \eta_y, \eta_z$,
+  calculates $t_n, s_a, t_a, b_0, b_1$
 \begin{gather}
-%\label
-  g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} = t_n s_U^{c}, \quad
-  g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) = t_a s_a^{c} \\
-%
-%\label
-  g^{(X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 +
-     (A_1^2 + A_2^2 + A_3^2 + A_4^2) - c^2 d^2}
-  g_r^{R_d} = \tilde b_1^{c} \tilde b_0
+  t_n = g_x^{\beta_x} g_y^{\beta_y} g_z^{\beta_z} g^{\beta_r} \\
+  s_a = g^{\gamma} (\prod_{j=1}^4 h_j^{a_j}),  \qquad
+  t_a = g^{\eta} (\prod_{j=1}^4 h_j^{\alpha_j})
 \end{gather}
-with following changes on proving side:
+\begin{multline}
+  \tilde f_0 = \beta_x^2 + \beta_y^2 +\beta_z^2 + \alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \alpha_4^2  \\
+  \tilde f_1 = (x_n - x_l) \beta_x  + (y_n - y_l) \beta_y  + (z_n - z_l) \beta_z + a_1 \alpha_1 + a_2 \alpha_2 + a_3 \alpha_3 + a_4 \alpha_4 \\
+  b_0 = g^{\tilde f_0} g_r^{\rho_0},   \qquad
+  b_1 = g^{2 \tilde f_1} g_r^{\rho_1}
+\end{multline}
+
+\item
+  Prover calclulates a challenge
 \begin{gather}
-  \tilde b_0 = g^{\tilde f_0} g_r^{\rho_0},   \qquad
-  \tilde b_1 = g^{2 \tilde f_1} g_r^{\rho_1}    \\
-\tilde f_0 = \beta_x^2 + \beta_y^2 +\beta_z^2 + \alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \alpha_4^2  \\
-\tilde f_1 = (x_n - x_l) \beta_x  + (y_n - y_l) \beta_y  + (z_n - z_l) \beta_z + a_1 \alpha_1 + a_2 \alpha_2 + a_3 \alpha_3 + a_4 \alpha_4
+  c = H(t_n || s_a || t_a || b_1 || b_0)
 \end{gather}
-With changes above, only non-negative exponents are expected
-while verifying location statement.
 
+\item
+  Prover computes responses
+\begin{multline}
+  X_n = -c x_n + \beta_x,  \;
+  Y_n = -c y_n + \beta_y,  \;
+  Z_n = -c z_n + \beta_z,   \;
+  R = -c r + \beta_r   \\
+  A_j = -c a_j + \alpha_j, \;
+  R_a = -c \gamma + \eta,   \;
+  R_d = -c \rho_1 + \rho_0
+\end{multline}
+Non-interactive proof is
+$(c, X_n, Y_n, Z_n, R, \{A_j\}, R_a, R_d, s_a, b_1)$.
 
+\item
+  Proof verification
+\begin{multline}
+\label{verf-chash}
+  F_d = ((X_n + c x_l)^2 + (Y_n + c y_l)^2 + (Z_n + c z_l)^2) + (A_1^2 + A_2^2 + A_3^2 + A_4^2) - c^2 d^2 \\
+  H(g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{c} ||
+    s_a ||
+    g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{c} ||
+    b_1 ||
+    g^{F_d} g_r^{R_d} b_1^c)
+  = c
+\end{multline}
+
+\end{enumerate}
+
+Verifying completeness property (not part of the protocol):
+\begin{multline}
+  f_V(v) = f_2 v^2 - f_1 v + f_0 = \\
+  (((-v x_n + \beta_x) + v x_l)^2 +
+   ((-v y_n + \beta_y) + v y_l)^2 +
+   ((-v z_n + \beta_z) + v z_l)^2) +  \\
+  ((-v a_1 + \alpha_1)^2 +
+   (-v a_2 + \alpha_2)^2 +
+   (-v a_3 + \alpha_3)^2 +
+   (-v a_4 + \alpha_4)^2) - v^2 d^2  = \\
+  v^2 (((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) + (a_1^2 + a_2^2 + a_3^2 + a_4^2) - d^2) - \\
+  2 v (((x_n - x_l) \beta_x + (y_n - y_l) \beta_y + (z_n - z_l) \beta_z) + (a_1 \alpha_1 + a_2 \alpha_2 + a_3 \alpha_3 + a_4 \alpha_4)) + \\
+  ((\beta_x^2 + \beta_y^2 + \beta_z^2) + (\alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \alpha_4^2))
+\end{multline}
 
 \end{document}
 
-Platin location primitive
-uuid
-t time
-x,y,z
-example (10.4)
-error
 
-
-
-Todo
-
-%Add awarding (payment) part to the proof system.\\
-``Trajectories are close enough'' proof \\
-%Introduce Merkle tree -based proofs with zk-SNARK. \\
-Introduce accumulator for a set of time-locations, as a feasible alternative for Merkle tree. \\
-Specify ranges for random numbers.\\
-Design enforcement for ``just one single location at a time''. \\
+%Add awarding (payment) part to the proof system.
+``Trajectories are close enough'' proof 
+%Introduce Merkle tree -based proofs with zk-SNARK. 
+Introduce accumulator for a set of time-locations, as a feasible alternative for Merkle tree. 
+Specify ranges for random numbers.
+Design enforcement for ``just one single location at a time''.
 Add references (bibliography).
+
+\begin{enumerate}
+\item
+  Prover (node) calculates~\eqref{eq-distn} $a_1 \dots a_4$ from locations and threshold
+  with Rabin-Shallit algorithm~\footnote{Before R-S algorithm is implemented,
+  we actually pick some $a_j$ and calculate threshold (radius) instead.},
+  picks random $\alpha_j, \eta, \gamma, \beta_x, \beta_y, \beta_z, \beta_r, \rho_0, \rho_1$, %, \eta_x, \eta_y, \eta_z$,
+  computes and sends initial commitments $b_0, b_1, t_a, t_n$ \\
+  ($f_0$ and $f_1$ are explained at Background section)
+\begin{gather}
+  b_0 = g^{f_0} g_r^{\rho_0},   \qquad
+  b_1 = g^{f_1} g_r^{\rho_1}    \\
+  s_a = g^{\gamma} \prod_{j=1}^4 h_j^{a_j},   \qquad
+  t_a = g^{\eta} \prod_{j=1}^4 h_j^{\alpha_j} ,   \qquad
+  t_n = g_x^{\beta_x} g_y^{\beta_y} g_z^{\beta_z} g^{\beta_r}
+%  t_y = g^{\beta_y} h^{\eta_y},   \qquad
+%  t_z = g^{\beta_z} h^{\eta_z}
+\end{gather}
+
+\item
+  Proof verification
+\begin{gather}
+\label{verf-linear}
+  g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{-c} = t_n, \quad
+  g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{-c} = t_a \\
+%
+\label{verf-distn}
+  g^{c^2 d^2 - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} g_r^{R_d} = b_1^{c} b_0
+%  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
+\end{gather}
+  
+\end{enumerate}
+
+
+This polynomial is actually linear ($f_2 = 0$, degree-one in $v$)
+if, and only if
+statement about distance~\eqref{eq-distn} holds for node coordinates that are hidden from verifier.
+We evaluate this polynomial at a random point chosen as the challenge of verifier.
+It follows, distance verification equation~\eqref{verf-distn}
+only needs constant $b_0$ and degree-one $b_1^c$ components.
+\begin{gather}
+  f_0 = -\beta_x^2 - \beta_y^2 - \beta_z^2 - \alpha_1^2 - \alpha_2^2 - \alpha_3^2 - \alpha_4^2
+\end{gather}
+\begin{multline}
+  f_1 = -2 (x_n - x_l) \beta_x  -2 (y_n - y_l) \beta_y  -2 (z_n - z_l) \beta_z \\
+        -2 a_1 \alpha_1 -2 a_2 \alpha_2 -2 a_3 \alpha_3 -2 a_4 \alpha_4
+\end{multline}
