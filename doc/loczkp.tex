@@ -511,7 +511,7 @@ modified to expect only positive exponents.
 \item
   Prover calclulates a challenge
 \begin{gather}
-  c = H(t_n || s_a || t_a || b_1 || b_0)
+  c = H(t_n || s_a || t_a || b_1 || b_0 || s_U)
 \end{gather}
 
 \item
@@ -537,7 +537,8 @@ $(c, X_n, Y_n, Z_n, R, \{A_j\}, R_a, R_d, s_a, b_1)$.
     s_a ||
     g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{c} ||
     b_1 ||
-    g^{F_d} g_r^{R_d} b_1^c)
+    g^{F_d} g_r^{R_d} b_1^c ||
+    s_U)
   = c
 \end{multline}
 
