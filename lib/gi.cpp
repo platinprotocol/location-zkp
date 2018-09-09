@@ -7,10 +7,10 @@
 #include "proofs.hpp"
 
 // https://math.stackexchange.com/questions/1969019/how-can-i-find-gcd167i-10-5i-by-using-the-euclidean-algorithm
-void ggcd(const GInt &pa, const GInt &pb, GInt &c) {
+void ggcd(const GInt &ga, const GInt &gb, GInt &gc) {
   bool done = false;
   CryptoPP::Integer denom;
-  GInt qt, rr, a = pa, b = pb, last_rr(0, 0);
+  GInt qt, rr, a = ga, b = gb, last_rr(0, 0);
   do {
     // mult by conj, div by norm^2
     denom = b.r * b.r + b.i * b.i;
@@ -22,8 +22,8 @@ void ggcd(const GInt &pa, const GInt &pb, GInt &c) {
     std::cout << "rmdr(" << rr.r << ", " << rr.i << ")" << std::endl;
     if(rr.r == 0 && rr.i == 0) {
       done = true;
-      c = last_rr;
-      std::cout << "gdc(" << c.r << ", " << c.i << ")" << std::endl;
+      gc = last_rr;
+      std::cout << "gdc(" << gc.r << ", " << gc.i << ")" << std::endl;
     } else {
       a = b;
       b = rr;
