@@ -1,7 +1,7 @@
 CFLAGS = -g2 -O3 -fPIC -pthread -pipe 
 CRYPTOPP = /Users/vfedyukovych/platin/src
 CFLAGS += -I$(CRYPTOPP)
-LIBS = -L$(CRYPTOPP)/cryptopp -L. -lproofs -lcryptopp
+LIBS = -L$(CRYPTOPP)/cryptopp -lcryptopp
 
 CFLAGS += -I../include
 
@@ -11,11 +11,15 @@ OBJS= $(SRCS:.cpp=.o)
 
 all:	$(LIB)
 
-test:	test-ggcd
+test:	test-ggcd test-qgcrd
 
-test-ggcd:	test-ggcd.o
+test-ggcd:	test-ggcd.o $(LIB)
 
 test-ggcd.o:	test-ggcd.cpp
+
+test-qgcrd:	test-qgcrd.o $(LIB)
+
+test-qgcrd.o:	test-qgcrd.cpp
 
 $(LIB):	$(OBJS)
 	g++ -shared $^ -o $@ $(LIBS)
@@ -24,7 +28,7 @@ $(LIB):	$(OBJS)
 	g++ -o $@ $(CFLAGS) -c $<
 
 .o:
-	g++ -o $@ $? $(LIBS)
+	g++ -o $@ $<  -L. -lproofs $(LIBS)
 
 clean:
 	rm -rf $(OBJS) $(LIB)
