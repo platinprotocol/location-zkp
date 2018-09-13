@@ -451,7 +451,7 @@ Rabin-Shallit algorithm for finding 4-tuple is mentioned at Idemix specification
 (section 6.2.6 Protocol ProveInequality, step 1.2)
 and ``[it] accounts for a substantial fraction of the computation time of this protocol''.
 % P. Schorn. Four squares. http://schorn.ch/lagrange.html. Accessed July 2008.
-% Michael O. Rabin and Jeffrey O. Shallit. Randomized algorithms in number theory. Commu- nications in pure and applied mathematics, 39:239–256, 1986.
+% Michael O. Rabin and Jeffrey O. Shallit. Randomized algorithms in number theory. Communications in pure and applied mathematics, 39:239–256, 1986.
 
 This algorithm requires some background, in particular quaternions (Hurwitz integers).
 Gaussian integers (a kind of complex numbers) are relevant as a simple object to start from.
@@ -471,6 +471,43 @@ Having it implemented, algorithm from Trevino presentation should be straightfor
 
 'Final Algorithm' is shown on page 11, Trevino presentation.
 It includes calculation of greatest common divisors over Gaussian integers and quaternions.
+
+\subsection{Lipmaa algorithm and 'emmy' implementation}
+
+\noindent
+\url{https://github.com/xlab-si/emmy/blob/master/crypto/common/decomposition.go} \\
+\url{https://github.com/xlab-si/emmy/blob/master/crypto/common/decomposition_test.go}
+
+\begin{enumerate}
+\item
+lipmaaDecompose() is the entrypoint;
+getSpecialDecomposition() is for small (0, 1, 2) and negative
+
+\item
+powers of 2; recursive lipmaaDecompose()
+
+\item
+'working' non-recursive is\\
+findPrimeAndTwoRoots();\\
+sqrtOfMinus1();\\
+decomposePrimeToTwoSquares().
+
+\item
+case of an even power of 2
+
+\item
+findPrimeAndTwoRoots(n) to find random $w_1$ and $w_2$ such that
+$p = n - w_1^2 - w_2^2 = 4 k + 1$ and is a prime.
+odd/even.
+
+\item
+decomposePrimeToTwoSquares() two largest reminders of Euclid algorithm that are less than sqrt(p);
+sqrt(-1) as the input.
+\url{https://math.stackexchange.com/questions/5877/efficiently-finding-two-squares-which-sum-to-a-prime/5883}
+
+\item
+\item
+\end{enumerate}
 
 \section{Verification as Solidity contract}
 
@@ -570,49 +607,3 @@ Specify ranges for random numbers.
 Design enforcement for ``just one single location at a time''.
 Add references (bibliography).
 
-\begin{enumerate}
-\item
-  Prover (node) calculates~\eqref{eq-distn} $a_1 \dots a_4$ from locations and threshold
-  with Rabin-Shallit algorithm~\footnote{Before R-S algorithm is implemented,
-  we actually pick some $a_j$ and calculate threshold (radius) instead.},
-  picks random $\alpha_j, \eta, \gamma, \beta_x, \beta_y, \beta_z, \beta_r, \rho_0, \rho_1$, %, \eta_x, \eta_y, \eta_z$,
-  computes and sends initial commitments $b_0, b_1, t_a, t_n$ \\
-  ($f_0$ and $f_1$ are explained at Background section)
-\begin{gather}
-  b_0 = g^{f_0} g_r^{\rho_0},   \qquad
-  b_1 = g^{f_1} g_r^{\rho_1}    \\
-  s_a = g^{\gamma} \prod_{j=1}^4 h_j^{a_j},   \qquad
-  t_a = g^{\eta} \prod_{j=1}^4 h_j^{\alpha_j} ,   \qquad
-  t_n = g_x^{\beta_x} g_y^{\beta_y} g_z^{\beta_z} g^{\beta_r}
-%  t_y = g^{\beta_y} h^{\eta_y},   \qquad
-%  t_z = g^{\beta_z} h^{\eta_z}
-\end{gather}
-
-\item
-  Proof verification
-\begin{gather}
-\label{verf-linear}
-  g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{-c} = t_n, \quad
-  g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{-c} = t_a \\
-%
-\label{verf-distn}
-  g^{c^2 d^2 - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} g_r^{R_d} = b_1^{c} b_0
-%  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
-\end{gather}
-  
-\end{enumerate}
-
-
-This polynomial is actually linear ($f_2 = 0$, degree-one in $v$)
-if, and only if
-statement about distance~\eqref{eq-distn} holds for node coordinates that are hidden from verifier.
-We evaluate this polynomial at a random point chosen as the challenge of verifier.
-It follows, distance verification equation~\eqref{verf-distn}
-only needs constant $b_0$ and degree-one $b_1^c$ components.
-\begin{gather}
-  f_0 = -\beta_x^2 - \beta_y^2 - \beta_z^2 - \alpha_1^2 - \alpha_2^2 - \alpha_3^2 - \alpha_4^2
-\end{gather}
-\begin{multline}
-  f_1 = -2 (x_n - x_l) \beta_x  -2 (y_n - y_l) \beta_y  -2 (z_n - z_l) \beta_z \\
-        -2 a_1 \alpha_1 -2 a_2 \alpha_2 -2 a_3 \alpha_3 -2 a_4 \alpha_4
-\end{multline}
