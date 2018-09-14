@@ -4,8 +4,19 @@
  */
 
 #include <iostream>
-#include "cryptopp/integer.h"
-#include "cryptopp/modarith.h"
+#ifdef __APPLE__
+    #include "TargetConditionals.h"
+    #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+        #include <integer.h>
+        #include <modarith.h>
+    #elif
+        #include "cryptopp/integer.h"
+        #include "cryptopp/modarith.h"
+    #endif
+#elif
+    #include "cryptopp/integer.h"
+    #include "cryptopp/modarith.h"
+#endif
 
 class GInt {
 public:
