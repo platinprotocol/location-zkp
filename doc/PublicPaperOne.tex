@@ -1,0 +1,150 @@
+\documentclass{article}
+% \documentclass{llncs}
+\usepackage{amsmath,amsfonts,url}
+
+\begin{document}
+
+\title{Private Location Verification}
+\author{Vadym Fedyukovych}
+% \institute{Platin.io}
+\maketitle
+
+\abstract{
+We present location verification protocol and implementation that allows for location privacy.
+With a Schnorr-like protocol, we verify that location committed is close enough to another known location.
+Protocol was implemented with {Crypto++} library.
+}
+
+\section{Introduction}
+
+Need for location privacy.
+Known results and state of the art.
+SNARK-based and 'older' interactive proofs-based solutions.
+
+\subsection{Our contribution}
+
+\section{Protocol}
+\subsection{Definitions}
+
+% Commitment, interactive proof system, witness indistinguishability and zero knowledge,
+% 'algebraic' interactive proofs,
+% proving relations about integers,
+% groups of hidden order,
+% Rabin-Shallit algorithm,
+% extending Schnorr protocol into higher degrees of challenge.
+% Proofs and arguments, completeness and soundness, of knowledge, zero knowledge and witness indistinguishability.
+% Hardness of factoring and finding group order, StrongRSA.
+
+\subsection{Notations}
+
+Airdrop location $(x_l, y_l)$ available in clear, node location $(x_n, y_n)$ hidden (committed),
+acceptable maximum distance $d$ from node to airdrop,
+setup: group description and parameters, group elements for making commitments,
+initial message, challenge and responces of a Schnorr-like protocol.
+
+\subsection{Interactive proof}
+
+Interactive argument system about integers is designed
+with a group of a hidden order~\cite{},
+that is, order of the group is not available to the Prover.
+Inequality (not far from) statement is converted into equality
+with 4-squares Lagrange theorem (Lipmaa).
+Schnorr proof was extended into a proof systems for polynomial relations
+with polynomials of higher degree in challenge
+for a number of applications~\cite{F363,CF12}.
+A comparable proof system for integers was introduced at~\cite{F10}.
+
+\subsection{Proof setup}
+
+Proof system for relations about integers is well described at Idemix documentation~\cite{Indemix}
+
+Multiplicative group of residue classes, RSA-like modulus.
+
+\begin{figure}[!htb]
+\begin{tabular}{|p{\linewidth}|}
+\hline
+
+Common input of Prover and Verifier is
+  commitment $s_U$ to node location~\eqref{cmt-up},
+  airdrop location $(x_l, y_l)$,
+  threshold $d^2$,
+  and parameres $(g, g_x, g_y, g_r, h_j)$:
+\begin{gather}
+\label{cmt-up}
+  s_U = g_x^{x_n} g_y^{y_n} g^{r}
+\end{gather}
+Private input of Prover is
+  node location $(x_n, y_n)$ and location commitment randomness~$r$,
+  four numbers~$\{a_j\}$ calculated with Rabin-Shallit algorithm according to~\eqref{eq-distn}.
+Statement being proved is
+\begin{gather}
+\label{eq-distn}
+  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2) = \sum_{j=1}^4 a_j^2
+\end{gather}
+Protocol runs as follows:
+\begin{enumerate}
+\item
+  Prover picks random $\alpha_j, \eta, \gamma, \beta_x, \beta_y, \beta_r, \rho_0, \rho_1$,
+  computes $f_0, f_1$, and sends initial commitments $b_0, b_1, t_a, t_n$:
+\begin{gather}
+  f_0 = -(\beta_x^2 + \beta_y^2) - \sum_{j=1}^4 \alpha_j^2,   \;
+  f_1 = -2( (x_n - x_l) \beta_x  + (y_n - y_l) \beta_y) -2 \sum_{j=1}^4 a_j \alpha_j   \\
+%
+  t_n = g_x^{\beta_x} g_y^{\beta_y} g^{\beta_r} ,   \;
+  s_a = g^{\gamma} \prod_{j=1}^4 h_j^{a_j},   \;
+  t_a = g^{\eta} \prod_{j=1}^4 h_j^{\alpha_j}, \;
+  b_0 = g^{f_0} g_r^{\rho_0},  \;
+  b_1 = g^{f_1} g_r^{\rho_1}
+\end{gather}
+%
+\item
+  Verifier chooses and sends his challenge $c$
+\item
+  Prover computes and sends responses
+\begin{gather}
+  X_n = c x_n + \beta_x,  \;
+  Y_n = c y_n + \beta_y,  \;
+  R = c r + \beta_r   \\
+  A_j = c a_j + \alpha_j, \;
+  R_a = c \gamma + \eta,   \;
+  R_d = c \rho_1 + \rho_0
+\end{gather}
+%
+\item
+  Verifier accepts if
+\begin{gather}
+\label{verf-linear}
+  g_x^{X_n} g_y^{Y_n} g^{R} s_U^{-c} = t_n, \quad
+  g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{-c} = t_a \\
+\label{verf-distn}
+  g^{c^2 d^2 - ((X_n - c x_l)^2 + (Y_n - c y_l)^2) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} g_r^{R_d} = b_1^{c} b_0
+\end{gather}
+\end{enumerate}
+\\
+\hline
+\end{tabular}
+\caption{Private location verification protocol}
+\label{fig}
+\end{figure}
+
+\subsection{Security properties}
+
+% Completeness and Soundness.
+% We reduce
+
+\section{Implementation}
+
+We have this protocol implemented on top of {Crypto++} library~\footnote{\url{https://cryptopp.com/}}
+serving as a bignumbers backend.
+
+Producing four-squares witness~\cite{PollackTrevino} is a work in progress, and is not a part of the protocol reported.
+To facilitate larger proof-of-concept application, a temporary approximate solution was introduced producing four squares.
+
+\section{Discussion and Conclusion}
+
+\bibliographystyle{plain}
+% \bibliographystyle{splncs}
+\bibliography{private_location_verification}
+
+%\appendix
+\end{document}
