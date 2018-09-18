@@ -4,9 +4,9 @@
  */
 
 #include <iostream>
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__ANDROID__)
     #include "TargetConditionals.h"
-    #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+    #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE || __ANDROID__
         #include <integer.h>
     #else
         #include "cryptopp/integer.h"
