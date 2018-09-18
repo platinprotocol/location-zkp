@@ -8,12 +8,11 @@
     #include "TargetConditionals.h"
     #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
         #include <integer.h>
-        #include <modarith.h>
-    #elif
+    #else
         #include "cryptopp/integer.h"
         #include "cryptopp/modarith.h"
     #endif
-#elif
+#else
     #include "cryptopp/integer.h"
     #include "cryptopp/modarith.h"
 #endif
