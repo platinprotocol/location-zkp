@@ -18,6 +18,13 @@
     #include "cryptopp/modarith.h"
 #endif
 
+/* Create and verify a non-interactive proof instance, according to section 14 at the documentation.
+ * Input is coordinates of the node, center and radius of the airdrop.
+ * Proof is encoded as a string.
+ */
+std::string ni_proof_create(const double xn, const double yn, const double zn, const double xl, const double yl, const double zl, const double d);
+bool ni_proof_verify(const std::string proof);
+
 class GInt {
 public:
   GInt(CryptoPP::Integer mr, CryptoPP::Integer mi) {r = mr; i = mi;};
