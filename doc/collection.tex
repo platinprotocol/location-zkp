@@ -595,6 +595,17 @@ Verifying completeness property (not part of the protocol):
   ((\beta_x^2 + \beta_y^2 + \beta_z^2) + (\alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \alpha_4^2))
 \end{multline}
 
+\subsection{Data flow}
+
+Non-Interactive proof shown above will be implemented in C++ as library functions
+\begin{verbatim}
+std::string ni_proof_create(
+  const double xn, const double yn, const double zn,
+  const double xl, const double yl, const double zl,
+  const double d);
+bool ni_proof_verify(const std::string proof);
+\end{verbatim}
+
 \end{document}
 
 
