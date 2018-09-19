@@ -56,3 +56,60 @@ void ggcd(const GInt &ga, const GInt &gb, GInt &gc);
  */
 void qgcrd(const QInt &qa, const QInt &qb, QInt &qc);
 
+class Parameters {
+public:
+  CryptoPP::Integer n,
+    g, gx, gy, gz, gr, h[4];
+  CryptoPP::ModularArithmetic group;
+  int rnd_bitsize_modulus,
+      rnd_bitsize_commitment,
+      rnd_bitsize_chall, rnd_offset_chall;
+};
+
+class PublicInfo {
+public:
+  long radius; // requested radius
+  CryptoPP::Integer x_l, y_l, z_l,
+    d2;  // threshold for distance (radius), squared, actual
+  CryptoPP::Integer s_u; // commitment to node_location
+};
+
+class PrivateInfo {
+public:
+  CryptoPP::Integer x, y, z,
+    r,
+    a[4],  // witness to non-negative (Lagrange theorem)
+    gamma;
+};
+
+class ProofPrivate {
+public:
+  CryptoPP::Integer
+    alpha[4], eta,
+    rho_0, rho_1,
+    beta_x, beta_y, beta_z, beta_r,
+    f_0, f_1;
+};
+
+class InitialCommitments {
+public:
+  CryptoPP::Integer b_0, b_1, s_a, t_a, t_n;
+};
+
+class Responses {
+public:
+  CryptoPP::Integer A[4], X_n, Y_n, Z_n, R, R_a, R_d;
+};
+
+void init_parameters(Parameters &parm);
+void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const Parameters &pp);
+CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U);
+void ni_proof_responses(Responses &resp, const CryptoPP::Integer &c, const PrivateInfo &privi, const ProofPrivate &privpf);
+void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp);
+
+CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer x, const CryptoPP::Integer y, const CryptoPP::Integer z, const CryptoPP::Integer r);
+CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Integer crnd, const CryptoPP::Integer a[]);
+CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Integer f, const CryptoPP::Integer rho);
+
+//CryptoPP::Integer rnd_commitment(const Parameters &parm);
+void rnd_commitment(const Parameters &parm, CryptoPP::Integer &s);
