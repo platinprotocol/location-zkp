@@ -77,7 +77,7 @@ public:
   long radius; // requested radius
   CryptoPP::Integer x_l, y_l, z_l,
     d2;  // threshold for distance (radius), squared, actual
-  CryptoPP::Integer s_u; // commitment to node_location
+  CryptoPP::Integer s_U; // commitment to node_location
 };
 
 class PrivateInfo {
@@ -108,7 +108,7 @@ public:
 };
 
 void init_parameters(Parameters &parm);
-void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const Parameters &pp);
+void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp);
 CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U);
 void ni_proof_responses(Responses &resp, const CryptoPP::Integer &c, const PrivateInfo &privi, const ProofPrivate &privpf);
 void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp);

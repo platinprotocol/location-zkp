@@ -8,7 +8,7 @@
 #include <iostream>
 #include "proofs.hpp"
 
-void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const Parameters &pp) {
+void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp) {
   // ic = {b_0, b_1, s_a, t_a, t_n};
 
   rnd_commitment(pp, privpf.beta_x);
@@ -25,7 +25,14 @@ void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &
      rnd_commitment(pp, privpf.alpha[j]);
   ic.t_a = CreateACommitment(pp, privpf.eta, privpf.alpha);
 
-  // f_0=, f_1=
+  privpf.f_0 = (privpf.beta_x * privpf.beta_x + privpf.beta_y * privpf.beta_y + privpf.beta_z * privpf.beta_z);
+  privpf.f_1 = (privi.x - pubi.x_l)*privpf.beta_x + (privi.y - pubi.y_l)*privpf.beta_y + (privi.z - pubi.z_l)*privpf.beta_z;
+  for(int j=0; j<4; j++) {
+    privpf.f_0 += privpf.alpha[j] * privpf.alpha[j];
+    privpf.f_1 +=  privi.a[j] * privpf.alpha[j];
+  }
+  privpf.f_1 *= 2;
+
   rnd_commitment(pp, privpf.rho_0);
   rnd_commitment(pp, privpf.rho_1);
   ic.b_0 = CreateNCommitment(pp, privpf.f_0, privpf.rho_0);
@@ -72,24 +79,50 @@ void ni_proof_responses(Responses &resp, const CryptoPP::Integer &c, const Priva
 void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp) {
   std::stringstream package;
   package << c << resp.X_n << resp.Y_n << resp.Z_n << resp.R << resp.A[0] << resp.A[1] << resp.A[2] << resp.A[3] << resp.R_a << resp.R_d << ic.s_a << ic.b_1;
-  // convert to string
+  proof = package.str();
+}
+
+long geo_x(double dlx) {
+  return 0;
+}
+
+long geo_y(double dly) {
+  return 0;
+}
+
+long geo_z(double dlz) {
+  return 0;
 }
 
 std::string ni_proof_create(const double xn, const double yn, const double zn, const double xl, const double yl, const double zl, const double d) {
-  std::string proof("Hello proof");
-
+  std::string proof;
+  PublicInfo pubi;
   PrivateInfo privi;
   ProofPrivate privpf;
   Parameters parm;
   InitialCommitments ic;
   Responses resp;
-  CryptoPP::Integer s_U, c;
-
-  // set coordinates in privi, produce commitment s_U, 
+  CryptoPP::Integer c;
 
   init_parameters(parm);
-  ni_proof_initial(ic, privi, privpf, parm);
-  c = ni_proof_challenge(ic, s_U);
+
+  // set coordinates in privi, produce commitment s_U, 
+  pubi.x_l = 0;
+  pubi.y_l = 0;
+  pubi.z_l = 0;
+
+  // x, y, z, r, a[4], gamma
+  privi.x = geo_x(xn - xl);
+  privi.y = geo_y(yn - yl);
+  privi.z = geo_z(zn - zl);
+  rnd_commitment(parm, privi.r);
+  pubi.s_U = CreateCommitment(parm, privi.x, privi.y, privi.z, privi.r);
+
+  pubi.d2 = d*d; // approx
+
+  // alpha[4], eta, rho_0, rho_1, beta_x, beta_y, beta_z, f_0, f_1
+  ni_proof_initial(ic, privi, privpf, pubi, parm);
+  c = ni_proof_challenge(ic, pubi.s_U);
   ni_proof_responses(resp, c, privi, privpf);
   ni_proof_serialize(proof, ic, c, resp);
   return proof;
