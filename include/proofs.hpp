@@ -6,17 +6,23 @@
 #include <iostream>
 #if defined(__ANDROID__)
     #include <integer.h>
+    #include <sha.h>
+    #include <modarith.h>
 #elif defined(__APPLE__)
     #include "TargetConditionals.h"
     #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
         #include <integer.h>
+        #include <sha.h>
+        #include <modarith.h>
     #else
         #include "cryptopp/integer.h"
         #include "cryptopp/modarith.h"
+        #include "cryptopp/sha.h"
     #endif
 #else
     #include "cryptopp/integer.h"
     #include "cryptopp/modarith.h"
+    #include "cryptopp/sha.h"
 #endif
 
 /* Create and verify a non-interactive proof instance, according to section 14 at the documentation.

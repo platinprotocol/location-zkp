@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include "cryptopp/sha.h"
 #include "proofs.hpp"
 
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const Parameters &pp) {
