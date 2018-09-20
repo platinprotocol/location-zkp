@@ -4,9 +4,12 @@
  */
 
 #include <string>
+#include <string.h>
 #include <sstream>
 #include <iostream>
 #include "proofs.hpp"
+
+// #define DBG_SERIALIZE
 
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp) {
   // ic = {b_0, b_1, s_a, t_a, t_n};
@@ -128,16 +131,60 @@ std::string ni_proof_create(const double xn, const double yn, const double zn, c
   return proof;
 }
 
-void ni_reproduce_initial(InitialCommitments &ic) {
-  ;
+void ni_reproduce_initial(InitialCommitments &ic, const Responses &resp, const Parameters &parm) {
+  CryptoPP::Integer X_n, Y_n, Z_n, R,
+    A[4], R_a;
+  CryptoPP::Integer re_a[4];
+
+  ic.t_n = CreateCommitment(parm, X_n, Y_n, Z_n, R);
+  ic.t_a = CreateACommitment(parm, R_a, A);
+}
+
+void ni_proof_deserialize(const std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp) {
+#define SZ 1024
+  char bf[SZ];
+  const char *nxt,
+#ifdef DBG_SERIALIZE
+                  *p = "12.345671111111111111111111111222222222222222222222222888888888888888888.-890222222222222222222222222777777777777777777333333333333333333.";
+    //&(bf[0]);
+#else
+                  *p = proof.c_str();
+#endif
+  int cnt;
+
+  // p=proof.c_str(), 
+  // std::cout << c << resp.X_n << resp.Y_n << resp.Z_n << resp.R << resp.A[0] << resp.A[1] << resp.A[2] << resp.A[3] << resp.R_a << resp.R_d << ic.s_a << ic.b_1;
+  // 1+(3+1)+(4+1)+1+2 = 13
+  CryptoPP::Integer args[13];
+  cnt = 0;
+  while((nxt = strchr(p, '.')) != NULL) {
+    strncpy(bf, p, (int)(nxt-p));
+    *(bf + (nxt-p)) = 0;
+    p = nxt+1;
+    CryptoPP::Integer aa(bf);
+    args[cnt] = aa;
+#ifdef DBG_SERIALIZE
+    printf("   %s\n", bf);
+    std::cout << cnt << ": " << args[cnt] << std::endl;
+#endif
+    cnt++;
+  }
+  if(cnt != 3) { // 13
+    std::cout << "Invalid encoding" << std::endl;
+  }
 }
 
 bool ni_proof_verify(const std::string proof) {
-  CryptoPP::Integer s_U, repr_c;
-  InitialCommitments ic;
+  Parameters parm;
+  CryptoPP::Integer s_U, c, repr_c;
+  InitialCommitments re_ic;
+  Responses resp;
 
-  ni_reproduce_initial(ic);
-  repr_c = ni_proof_challenge(ic, s_U);
+  ni_proof_deserialize(proof, re_ic, c, resp);
+/*
+  ni_reproduce_initial(re_ic, resp, parm);
+  repr_c = ni_proof_challenge(re_ic, s_U);
   //  return repr_c == proof.c;
+*/
   return true;
 }
