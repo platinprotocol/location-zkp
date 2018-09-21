@@ -9,6 +9,7 @@
 #include <iostream>
 #include "proofs.hpp"
 
+// #define DBG_NICHALLENGE
 // #define DBG_SERIALIZE
 
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp) {
@@ -50,10 +51,6 @@ CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoP
   cpreimg << ic.t_n << ic.s_a << ic.t_a << ic.b_1 << ic.b_0 << s_U; //concatenate numbers into single string so that we can push that into hash function.
   CryptoPP::byte *pimg = (CryptoPP::byte *) cpreimg.str().c_str();
   int sz = strlen(cpreimg.str().c_str());
-/*
-  std::cout << pimg << std::endl
-	    << sz << std::endl;
-*/
   hashf.CalculateDigest(h_img, pimg, sz); //calculating hash, result printed into h_img
 
   // explicit conversion into a bignumber, byte by byte
@@ -62,7 +59,11 @@ CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoP
     std::cout << (unsigned int) h_img[j] << std::endl;
     c = c*256 + (unsigned int)h_img[j]; 
   }
-  //  std::cout << c << std::endl;
+#ifdef DBG_NICHALLENGE
+  std::cout << pimg << std::endl
+	    << sz << std::endl;
+  std::cout << c << std::endl;
+#endif
   return c;
 }
 
@@ -85,18 +86,6 @@ void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const 
   proof = package.str();
 }
 
-long geo_x(double dlx) {
-  return 0;
-}
-
-long geo_y(double dly) {
-  return 0;
-}
-
-long geo_z(double dlz) {
-  return 0;
-}
-
 std::string ni_proof_create(const double xn, const double yn, const double zn, const double xl, const double yl, const double zl, const double d) {
   std::string proof;
   PublicInfo pubi;
@@ -116,7 +105,7 @@ std::string ni_proof_create(const double xn, const double yn, const double zn, c
 
   // x, y, z, r, a[4], gamma
   privi.x = geo_x(xn - xl);
-  privi.y = geo_y(yn - yl);
+  privi.y = geo_y(yn - yl, yl);
   privi.z = geo_z(zn - zl);
   rnd_commitment(parm, privi.r);
   pubi.s_U = CreateCommitment(parm, privi.x, privi.y, privi.z, privi.r);
@@ -146,13 +135,11 @@ void ni_proof_deserialize(const std::string &proof, const InitialCommitments &ic
   const char *nxt,
 #ifdef DBG_SERIALIZE
                   *p = "12.345671111111111111111111111222222222222222222222222888888888888888888.-890222222222222222222222222777777777777777777333333333333333333.";
-    //&(bf[0]);
 #else
                   *p = proof.c_str();
 #endif
   int cnt;
 
-  // p=proof.c_str(), 
   // std::cout << c << resp.X_n << resp.Y_n << resp.Z_n << resp.R << resp.A[0] << resp.A[1] << resp.A[2] << resp.A[3] << resp.R_a << resp.R_d << ic.s_a << ic.b_1;
   // 1+(3+1)+(4+1)+1+2 = 13
   CryptoPP::Integer args[13];

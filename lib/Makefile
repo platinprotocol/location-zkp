@@ -6,7 +6,7 @@ LIBS = -L$(CRYPTOPP)/cryptopp -lcryptopp
 CFLAGS += -I../include
 
 LIB= libproofs.so
-SRCS= round.cpp qt.cpp gi.cpp commitments.cpp parameters.cpp niproof.cpp
+SRCS= round.cpp qt.cpp gi.cpp commitments.cpp parameters.cpp niproof.cpp lagrange.cpp geocoord.cpp
 OBJS= $(SRCS:.cpp=.o)
 
 all:	$(LIB)

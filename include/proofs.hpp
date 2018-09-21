@@ -119,5 +119,10 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
 CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Integer crnd, const CryptoPP::Integer a[]);
 CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Integer f, const CryptoPP::Integer rho);
 
-//CryptoPP::Integer rnd_commitment(const Parameters &parm);
 void rnd_commitment(const Parameters &parm, CryptoPP::Integer &s);
+
+long get_airdrop_radius(PublicInfo &pubi, PrivateInfo &privi);
+
+long geo_x(double dlx);
+long geo_y(double dly, double org_latitude);
+long geo_z(double dlz);
