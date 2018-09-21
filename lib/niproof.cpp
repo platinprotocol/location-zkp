@@ -110,7 +110,9 @@ std::string ni_proof_create(const double xn, const double yn, const double zn, c
   rnd_commitment(parm, privi.r);
   pubi.s_U = CreateCommitment(parm, privi.x, privi.y, privi.z, privi.r);
 
-  pubi.d2 = d*d; // approx
+  pubi.radius = d;
+  //  pubi.d2 = d*d; // approx
+  get_airdrop_radius(pubi, privi);
 
   // alpha[4], eta, rho_0, rho_1, beta_x, beta_y, beta_z, f_0, f_1
   ni_proof_initial(ic, privi, privpf, pubi, parm);
@@ -121,12 +123,33 @@ std::string ni_proof_create(const double xn, const double yn, const double zn, c
 }
 
 void ni_reproduce_initial(InitialCommitments &ic, const Responses &resp, const Parameters &parm) {
-  CryptoPP::Integer X_n, Y_n, Z_n, R,
-    A[4], R_a;
-  CryptoPP::Integer re_a[4];
+  CryptoPP::Integer c, X_n, Y_n, Z_n, R,
+    A[4], R_a,
+    F_d, R_d,
+    s_U;
+  PublicInfo pubi;
 
-  ic.t_n = CreateCommitment(parm, X_n, Y_n, Z_n, R);
-  ic.t_a = CreateACommitment(parm, R_a, A);
+  // copy from NIproof
+  ic.s_a = 0;
+  ic.b_1 = 0;
+
+  ic.t_n = parm.group.Multiply(
+	     CreateCommitment(parm, X_n, Y_n, Z_n, R), // g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^R
+	     parm.group.Exponentiate(s_U, c)); // s_U^c
+  ic.t_a = parm.group.Multiply(
+	     CreateACommitment(parm, R_a, A), // \prod_j h_j^{A_j} g^{R_a}
+	     parm.group.Exponentiate(ic.s_a, c)); // s_a^c
+
+  F_d = (X_n + c * pubi.x_l)*(X_n + c * pubi.x_l) +
+        (Y_n + c * pubi.y_l)*(Y_n + c * pubi.y_l) +
+        (Z_n + c * pubi.z_l)*(Z_n + c * pubi.z_l)
+        - c * c * pubi.d2;
+  for(int j=0; j<4; j++)
+    F_d += A[j] * A[j];
+
+  ic.b_0 = parm.group.Multiply(
+	     CreateNCommitment(parm, F_d, R_d), // g^{F_d} g_r^{R_d}
+	     parm.group.Exponentiate(ic.b_1, c)); // b_1^c
 }
 
 void ni_proof_deserialize(const std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp) {

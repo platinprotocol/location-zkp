@@ -75,8 +75,8 @@ public:
 class PublicInfo {
 public:
   long radius; // requested radius
-  CryptoPP::Integer x_l, y_l, z_l,
-    d2;  // threshold for distance (radius), squared, actual
+  CryptoPP::Integer x_l, y_l, z_l,  // airdrop center
+    d2;  // threshold for distance (radius), squared, actual, approximate at the moment
   CryptoPP::Integer s_U; // commitment to node_location
 };
 

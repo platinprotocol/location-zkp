@@ -6,18 +6,20 @@
 #include <iostream>
 #include "proofs.hpp"
 
+#define DBG_NEGEXP
+#define DBG_LOCCOMM
+#define DBG_ACOMM
+#define DBG_NCOMM
+
 CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer x, const CryptoPP::Integer y, const CryptoPP::Integer z, const CryptoPP::Integer r) {
   CryptoPP::Integer s;
 
 #ifdef DBG_NEGEXP
-  s = pp.group.Multiply(
-          neg_a_exp_b_mod_c(pp.gx, x, pp.group),
-          pp.group.Multiply(
-             neg_a_exp_b_mod_c(pp.gy, y, pp.group),
-             pp.group.Multiply(
-                neg_a_exp_b_mod_c(pp.gz, z, pp.gz),
-                neg_a_exp_b_mod_c(pp.gr, r, pp.group))));
-#else
+  if(x < 0 || y < 0 || z < 0 || r < 0) {
+    std::cout << "Negative exp at CreateCommitment()" << std::endl;
+    return CryptoPP::Integer::Zero();
+  }
+#endif
   s = pp.group.Multiply(
 	  pp.group.Exponentiate(pp.gx, x),
 	  pp.group.Multiply(
@@ -25,7 +27,6 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
              pp.group.Multiply(
 		pp.group.Exponentiate(pp.gz, z),
                 pp.group.Exponentiate(pp.gr, r))));
-#endif
 
 #ifdef DBG_LOCCOMM
   std::cout << "x " << x << " y " << y << " z " << z << " r " << r << std::endl;
@@ -35,9 +36,21 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
 }
 
 CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Integer crnd, const CryptoPP::Integer a[]) {
+#ifdef DBG_NEGEXP
+  if(crnd < 0) {
+    std::cout << "Negative exp at CreateACommitment()" << std::endl;
+    return CryptoPP::Integer::Zero();
+  }
+#endif
   CryptoPP::Integer s = pp.group.Exponentiate(pp.g, crnd), t;
 
   for(int j=0; j<4; j++) {
+#ifdef DBG_NEGEXP
+  if(a[j] < 0) {
+    std::cout << "Negative exp at CreateACommitment() " << j << std::endl;
+    return CryptoPP::Integer::Zero();
+  }
+#endif
     //    std::cout << s <<  " _ ";
     t = pp.group.Multiply(s, pp.group.Exponentiate(pp.h[j], a[j]));
     s = t;
@@ -53,22 +66,17 @@ CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Intege
 
 CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Integer f, const CryptoPP::Integer rho) {
   CryptoPP::Integer s, t;
+
 #ifdef DBG_NEGEXP
-  t = neg_a_exp_b_mod_c(pp.g, f, pp.group);
-#else
-  if(f < 0) {
-    s = pp.group.Exponentiate(pp.g, -f);
-    t = pp.group.MultiplicativeInverse(s);
-  } else {
-    t = pp.group.Exponentiate(pp.g, f);
+  if(f < 0 || rho < 0) {
+    std::cout << "Negative exp at CreateNCommitment()" << std::endl;
+    return CryptoPP::Integer::Zero();
   }
 #endif
+
+  t = pp.group.Exponentiate(pp.g, f);
   s = pp.group.Multiply(t,
-#ifdef DBG_NEGEXP
-        neg_a_exp_b_mod_c(pp.gr, rho, pp.group));
-#else
         pp.group.Exponentiate(pp.gr, rho));
-#endif
 
 #ifdef DBG_NCOMM
   std::cout << "f " << f << std::endl;
@@ -80,5 +88,5 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
 }
 
 void rnd_commitment(const Parameters &parm, CryptoPP::Integer &s) {
-  ;
+  s = 0;
 }
