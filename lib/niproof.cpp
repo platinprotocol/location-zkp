@@ -191,10 +191,10 @@ bool ni_proof_verify(const std::string proof) {
   Responses resp;
 
   ni_proof_deserialize(proof, re_ic, c, resp);
-/*
+
   ni_reproduce_initial(re_ic, resp, parm);
   repr_c = ni_proof_challenge(re_ic, s_U);
-  //  return repr_c == proof.c;
-*/
-  return true;
+  return repr_c == c;
+
+  //  return true;
 }
