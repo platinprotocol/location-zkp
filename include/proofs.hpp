@@ -126,3 +126,7 @@ long get_airdrop_radius(PublicInfo &pubi, PrivateInfo &privi);
 long geo_x(double dlx);
 long geo_y(double dly, double org_latitude);
 long geo_z(double dlz);
+
+#define NIPROOF_COMPONENTS 13
+void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp);
+void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, CryptoPP::Integer &c, Responses &resp);

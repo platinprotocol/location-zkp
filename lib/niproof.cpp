@@ -129,10 +129,6 @@ void ni_reproduce_initial(InitialCommitments &ic, const Responses &resp, const P
     s_U;
   PublicInfo pubi;
 
-  // copy from NIproof
-  ic.s_a = 0;
-  ic.b_1 = 0;
-
   ic.t_n = parm.group.Multiply(
 	     CreateCommitment(parm, X_n, Y_n, Z_n, R), // g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^R
 	     parm.group.Exponentiate(s_U, c)); // s_U^c
@@ -152,7 +148,7 @@ void ni_reproduce_initial(InitialCommitments &ic, const Responses &resp, const P
 	     parm.group.Exponentiate(ic.b_1, c)); // b_1^c
 }
 
-void ni_proof_deserialize(const std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp) {
+void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, CryptoPP::Integer &c, Responses &resp) {
 #define SZ 1024
   char bf[SZ];
   const char *nxt,
@@ -165,7 +161,7 @@ void ni_proof_deserialize(const std::string &proof, const InitialCommitments &ic
 
   // std::cout << c << resp.X_n << resp.Y_n << resp.Z_n << resp.R << resp.A[0] << resp.A[1] << resp.A[2] << resp.A[3] << resp.R_a << resp.R_d << ic.s_a << ic.b_1;
   // 1+(3+1)+(4+1)+1+2 = 13
-  CryptoPP::Integer args[13];
+  CryptoPP::Integer args[NIPROOF_COMPONENTS];
   cnt = 0;
   while((nxt = strchr(p, '.')) != NULL) {
     strncpy(bf, p, (int)(nxt-p));
@@ -179,9 +175,22 @@ void ni_proof_deserialize(const std::string &proof, const InitialCommitments &ic
 #endif
     cnt++;
   }
-  if(cnt != 3) { // 13
+  if(cnt != NIPROOF_COMPONENTS) {
     std::cout << "Invalid encoding" << std::endl;
   }
+  c = args[0];
+  resp.X_n = args[1];
+  resp.Y_n = args[2];
+  resp.Z_n = args[3];
+  resp.R = args[4];
+  resp.A[0] = args[5];
+  resp.A[1] = args[6];
+  resp.A[2] = args[7];
+  resp.A[3] = args[8];
+  resp.R_a = args[9];
+  resp.R_d = args[10];
+  ic.s_a = args[11];
+  ic.b_1 = args[12];
 }
 
 bool ni_proof_verify(const std::string proof) {
