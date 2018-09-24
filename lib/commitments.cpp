@@ -16,7 +16,12 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
 
 #ifdef DBG_NEGEXP
   if(x < 0 || y < 0 || z < 0 || r < 0) {
-    std::cout << "Negative exp at CreateCommitment()" << std::endl;
+    std::cout << "Negative exp at CreateCommitment()" << std::endl
+	      << "x: " << x
+	      << "  y: " << y
+	      << "  z: " << z
+	      << "  r: " << r
+	      << std::endl;
     return CryptoPP::Integer::Zero();
   }
 #endif
@@ -38,7 +43,13 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
 CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Integer crnd, const CryptoPP::Integer a[]) {
 #ifdef DBG_NEGEXP
   if(crnd < 0) {
-    std::cout << "Negative exp at CreateACommitment()" << std::endl;
+    std::cout << "Negative exp at CreateACommitment()" << std::endl
+	      << "a0: " << a[0]
+	      << "  a1: " << a[1]
+	      << "  a2: " << a[2]
+	      << "  a3: " << a[3]
+	      << "  r: " << crnd
+	      << std::endl;
     return CryptoPP::Integer::Zero();
   }
 #endif
@@ -69,7 +80,10 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
 
 #ifdef DBG_NEGEXP
   if(f < 0 || rho < 0) {
-    std::cout << "Negative exp at CreateNCommitment()" << std::endl;
+    std::cout << "Negative exp at CreateNCommitment()" << std::endl
+	      << "f: " << f
+	      << "  r: " << rho
+	      << std::endl;
     return CryptoPP::Integer::Zero();
   }
 #endif
@@ -88,5 +102,5 @@ CryptoPP::Integer CreateNCommitment(const Parameters &pp, const CryptoPP::Intege
 }
 
 void rnd_commitment(const Parameters &parm, CryptoPP::Integer &s) {
-  s = 0;
+  s = CryptoPP::Integer::One() << 256+30;
 }

@@ -111,9 +111,8 @@ void init_parameters(Parameters &parm);
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp);
 CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U);
 void ni_proof_responses(Responses &resp, const CryptoPP::Integer &c, const PrivateInfo &privi, const ProofPrivate &privpf);
-void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp);
 
-void ni_reproduce_initial(InitialCommitments &ic, const Responses &resp, const Parameters &parm);
+void ni_reproduce_initial(const CryptoPP::Integer c, const CryptoPP::Integer s_U, const CryptoPP::Integer d2, InitialCommitments &ic, const Responses &resp, const Parameters &parm);
 
 CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer x, const CryptoPP::Integer y, const CryptoPP::Integer z, const CryptoPP::Integer r);
 CryptoPP::Integer CreateACommitment(const Parameters &pp, const CryptoPP::Integer crnd, const CryptoPP::Integer a[]);
@@ -127,6 +126,6 @@ long geo_x(double dlx);
 long geo_y(double dly, double org_latitude);
 long geo_z(double dlz);
 
-#define NIPROOF_COMPONENTS 13
-void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp);
-void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, CryptoPP::Integer &c, Responses &resp);
+#define NIPROOF_COMPONENTS 15
+void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp, const CryptoPP::Integer &s_U, const CryptoPP::Integer &d2);
+void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, CryptoPP::Integer &c, Responses &resp, CryptoPP::Integer &s_U, CryptoPP::Integer &d2);

@@ -1,16 +1,20 @@
 #include <string>
 #include <iostream>
-#include "cryptopp/integer.h"
-#include "cryptopp/modarith.h"
 #include "proofs.hpp"
 
 int main() {
-  std::string proof("11.22222.5555555555555555.");
+  std::string proof;
   bool ok;
 
-  //  proof = ni_proof_create(1.0, 1.0, 1.0,
-  //                          2.0, 2.0, 2.0, 8.0);
+  // Geo coordinates, in decimal degrees for latitude-longitude
+  proof = ni_proof_create(44.1, 21.3, 3.9,
+                          44.0, 21.0, 2.0, 38000.0);
+  std::cout << "proof: " << proof << std::endl;
   ok = ni_proof_verify(proof);
-
+  if(ok) {
+    std::cout << "True" << std::endl;
+  } else {
+    std::cout << "False" << std::endl;
+  }
   return 0;
 }
