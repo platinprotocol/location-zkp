@@ -6,10 +6,10 @@
 #include <iostream>
 #include "proofs.hpp"
 
-#define DBG_NEGEXP
-#define DBG_LOCCOMM
-#define DBG_ACOMM
-#define DBG_NCOMM
+//#define DBG_NEGEXP
+//#define DBG_LOCCOMM
+//#define DBG_ACOMM
+//#define DBG_NCOMM
 
 CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer x, const CryptoPP::Integer y, const CryptoPP::Integer z, const CryptoPP::Integer r) {
   CryptoPP::Integer s;
