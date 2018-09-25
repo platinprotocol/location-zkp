@@ -11,6 +11,14 @@
 
 //#define DBG_NICHALLENGE
 //#define DBG_SERIALIZE
+std::string integer_to_string(CryptoPP::Integer integer) {
+    std::string retVal;
+    retVal.resize(integer.MinEncodedSize());
+    
+    integer.Encode((CryptoPP::byte *)retVal.data(), retVal.size());
+    
+    return retVal;
+}
 
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp) {
   // ic = {b_0, b_1, s_a, t_a, t_n};
@@ -46,23 +54,32 @@ void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &
 CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U) {
   CryptoPP::byte h_img[CryptoPP::SHA256::DIGESTSIZE]; //20 bytes of result hash, or 30 for sha256 - result of this function
   CryptoPP::SHA256 hashf;
+  
+  std::string var = integer_to_string(ic.t_n) + "." +
+      integer_to_string(ic.s_a) + "." +
+      integer_to_string(ic.t_a) + "." +
+      integer_to_string(ic.b_1) + "." +
+      integer_to_string(ic.b_0) + "." +
+      integer_to_string(s_U) + ".";
 
-  std::stringstream cpreimg;
-  cpreimg << ic.t_n << ic.s_a << ic.t_a << ic.b_1 << ic.b_0 << s_U; //concatenate numbers into single string so that we can push that into hash function.
-  CryptoPP::byte *pimg = (CryptoPP::byte *) cpreimg.str().c_str();
-  int sz = strlen(cpreimg.str().c_str());
+  CryptoPP::byte *pimg = (CryptoPP::byte *) var.c_str();
+
+  unsigned long sz =  var.length();
+    
   hashf.CalculateDigest(h_img, pimg, sz); //calculating hash, result printed into h_img
-
+  
   // explicit conversion into a bignumber, byte by byte
   CryptoPP::Integer c=0;
+    
   for(int j=0; j<CryptoPP::SHA256::DIGESTSIZE; j++) {
-    c = c*256 + (unsigned int)h_img[j]; 
+    c = c*256 + (unsigned int)h_img[j];
   }
+  
 #ifdef DBG_NICHALLENGE
   std::cout << "FS challenge: "
-	    << sz << "  "
-	    << cpreimg.str()
-	    << "  int: " << c << std::endl;
+        << sz << "  "
+        << var.c_str()
+        << "  int: " << c << std::endl;
 #endif
   return c;
 }
