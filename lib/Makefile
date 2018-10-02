@@ -1,4 +1,4 @@
-CFLAGS = -g2 -O3 -fPIC -pthread -pipe 
+CFLAGS = -g2 -O3 -fPIC -pthread -pipe
 CRYPTOPP = /Users/vfedyukovych/platin/src
 CFLAGS += -I$(CRYPTOPP)
 LIBS = -L$(CRYPTOPP)/cryptopp -lcryptopp
@@ -36,3 +36,18 @@ $(LIB):	$(OBJS)
 
 clean:
 	rm -rf $(OBJS) $(LIB)
+	rm -rf ./cli_ni_verify
+	rm -rf ./cli_ni_verify.o
+	rm -rf ./cli_ni_proof
+	rm -rf ./cli_ni_proof.o
+	rm -rf ./cli_ni_proof.o
+
+cli_ni:	cli_ni_proof cli_ni_verify
+
+cli_ni_proof:	cli_ni_proof.o $(LIB)
+
+cli_ni_proof.o:	cli_ni_proof.cpp
+
+cli_ni_verify:	cli_ni_verify.o $(LIB)
+
+cli_ni_verify.o:	cli_ni_verify.cpp
