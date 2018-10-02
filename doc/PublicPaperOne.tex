@@ -23,11 +23,11 @@ This proof is sufficient for many LBS, and preserves the users privacy.
 Location based services (LBS) are a multimillion dollar market.
 An LBS generally relies on a user's smartphone to disclose its location data, as people carry these devices with them almost everywhere, 
 use them over four hours each day on average, 
-and touch them over two thousand times a day. [Ref3]
+and touch them over two thousand times a day ~\cite{dscout}
 
 While LBS are increasingly popular and expanding into many areas of our daily lives,
 there is a  parallel and counter trend towards increasing privacy. 
-Privacy preserving tactics such as Data Minimization, Selective Disclosure and Progressive Trust are increasingly expected to be applied to our digital interactions. 
+Privacy preserving tactics such as Data Minimization, Selective Disclosure and Progressive Trust are increasingly expected to be applied to our digital interactions. ~\cite{CCGMDSDPT}
 
 For example, a user may attempt to use an online service that asks him to share his location in order to prove his geolocation.
 The user may hesitate, since he knows that the service may share this information with other parties without meaningful consent on his part. 
@@ -93,7 +93,7 @@ A comparable proof system for integers was introduced at~\cite{F10}.
 
 \subsection{Proof setup}
 
-Proof system for relations about integers is well described at Idemix documentation~\cite{Indemix}
+Proof system for relations about integers is well described at Idemix documentation~\cite{Idemix}
 
 Multiplicative group of residue classes, RSA-like modulus.
 
@@ -251,6 +251,8 @@ serving as a bignumbers backend.
 Producing four-squares witness~\cite{PollackTrevino} is a work in progress, and is not a part of the protocol reported.
 To facilitate larger proof-of-concept application, a temporary approximate solution was introduced producing four squares.
 
+\cite{Idemix}
+
 \section{Discussion and Conclusion}
 
 We have shown how a node can keep its location secret, yet allow a verifier to prove that the secret location is within a perimeter.
@@ -260,8 +262,5 @@ We offer two methods to do so: interactive and non-interactive.
 % \bibliographystyle{splncs}
 \bibliography{private_location_verification}
 
-%TO BE FORMATTTED
-References: [ref1] Data Minimization Paper from W3C by Wolberger et al in publication
-[ref3] dscout mobile touches 2016
 %\appendix
 \end{document}
