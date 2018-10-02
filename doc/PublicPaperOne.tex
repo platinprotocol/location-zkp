@@ -59,7 +59,7 @@ This zero knowledge procedure is described below.
 \subsection{Notations}
 
 A location based service publishes a location of interest. 
-The location is a geometric area. 
+The location is bounded within a perimeter, or boundary. 
 
 A simple case is that of a circle with a central point and a radius. 
 
@@ -93,9 +93,9 @@ A comparable proof system for integers was introduced at~\cite{F10}.
 
 \subsection{Proof setup}
 
-Proof system for relations about integers is well described at Idemix documentation~\cite{Idemix}
+We restrict ourselves to the use of integers, following the practice of Idemix~\cite{Idemix}.
 
-Multiplicative group of residue classes, RSA-like modulus.
+We setup a group based on quadratic residues, a property of numbers raised to the second power (squared) as they behave in modular arithmetic. The modulus is generated based on a safe RSA key pair. This constitutes a multiplicative group of residue classes, with an RSA-like modulus.
 
 \begin{figure}[!htb]
 \begin{tabular}{|p{\linewidth}|}
@@ -105,7 +105,7 @@ Common input of Prover and Verifier is
   commitment $s_U$ to node location~\eqref{cmt-up},
   airdrop location $(x_l, y_l, z_l)$ and
   threshold $d^2$ (integers),
-  parameres $(N, g, g_x, g_y, g_z, g_r, \{h_j\})$.
+  parameters $(N, g, g_x, g_y, g_z, g_r, \{h_j\})$.
 \begin{gather}
 \label{cmt-up}
   s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r} \pmod{N}
