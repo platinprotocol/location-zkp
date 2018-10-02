@@ -545,9 +545,9 @@ modified to expect only positive exponents.
 \end{multline}
 
 \item
-  Prover calclulates a challenge
+  Prover calclulates a challenge from text representation of commitments generated at presvious step and public parameters $pubp$.
 \begin{gather}
-  c = H(t_n || s_a || t_a || b_1 || b_0 || s_U)
+  c = H(t_n || s_a || t_a || b_1 || b_0 || s_U || pubp)
 \end{gather}
 
 \item
@@ -574,7 +574,8 @@ $(c, X_n, Y_n, Z_n, R, \{A_j\}, R_a, R_d, s_a, b_1)$.
     g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{c} ||
     b_1 ||
     g^{F_d} g_r^{R_d} b_1^c ||
-    s_U)
+    s_U ||
+    pubp)
   = c
 \end{multline}
 

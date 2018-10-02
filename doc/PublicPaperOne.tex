@@ -178,7 +178,8 @@ Input of Prover is
   location $(x_n, y_n, z_n)$ and random $r$ to open this commitment,
   airdrop location $(x_l, y_l, z_l)$,
   threshold $d^2$,
-  parameres $(N, g, g_x, g_y, g_z, g_r, h_j)$.
+  parameres $(N, g, g_x, g_y, g_z, g_r, h_j)$
+  and public information $pubp$.
 \\
 Non-interactive proof is produced as follows:
 \begin{enumerate}
@@ -199,9 +200,10 @@ Non-interactive proof is produced as follows:
 \end{gather}
 
 \item
-  Prover produces his challenge with a hash function:
+  Prover produces his challenge with a hash function
+  from text representation of commitments generated at previous step and public information:
 \begin{gather}
-  c = H(t_n || s_a || t_a || b_1 || b_0 || s_U)
+  c = H(t_n || s_a || t_a || b_1 || b_0 || s_U || pubp)
 \end{gather}
 
 \item
@@ -228,7 +230,8 @@ Proof verification:
     g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{c} ||
     b_1 ||
     g^{F_d} g_r^{R_d} b_1^c ||
-    s_U)
+    s_U ||
+    pubp)
   = c
 \end{multline}
 \\
