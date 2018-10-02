@@ -5,19 +5,43 @@
 \begin{document}
 
 \title{Private Location Verification}
-\author{Vadym Fedyukovych}
+\author{Lionel Wolberger, Vadym Fedyukovych}
 % \institute{Platin.io}
 \maketitle
 
 \abstract{
-We present location verification protocol and implementation that allows for location privacy.
-With a Schnorr-like protocol, we verify that location committed is close enough to another known location.
-Protocol was implemented with {Crypto++} library.
-}
+
+Location based services (LBS) rely on users' disclosing their location. 
+A zero knowledge procedure is proposed where a user provides a commitment that can be verified to show that the user is within a perimeter. 
+
+The simplest perimeter is a circle with radius R. The simplest polygon is a triangle. 
+The procedure is then shown to work for an arbitrary perimeter consisting of n points. 
+
+This proof is sufficient for many LBS, and preserves the users privacy. 
 
 \section{Introduction}
 
-Location is considered as a point within a plygon. Known results and state of the art. SNARK-based and 'older' interactive proofs-based solutions. This is the last line. 
+Location based services (LBS) are a multimillion dollar market.
+An LBS generally relies on a user's smartphone to disclose its location data, as people carry these devices with them almost everywhere, 
+use them over four hours each day on average, 
+and touch them over two thousand times a day. [Ref3]
+
+While LBS are increasingly popular and expanding into many areas of our daily lives,
+there is a  parallel and counter trend towards increasing privacy. 
+Privacy preserving tactics such as Data Minimization, Selective Disclosure and Progressive Trust are increasingly expected to be applied to our digital interactions. 
+
+For example, a user may attempt to use an online service that asks him to share his location in order to prove his geolocation.
+The user may hesitate, since he knows that the service may share this information with other parties without meaningful consent on his part. 
+
+Some LBS may not need a precise location, but only an assertion that the user is within a certain area. 
+
+This paper details a zero knowledge procedure to enable such assertions. 
+The user would share a cryptographic commitment rather than his exact location. 
+The commitment is validated, 
+and a proof is given that Diego is within a perimeter, 
+without revealing the secret of his actual location within this perimeter. 
+
+This zero knowledge procedure is described below. 
 
 \subsection{Our contribution}
 
@@ -35,21 +59,37 @@ Location is considered as a point within a plygon. Known results and state of th
 
 \subsection{Notations}
 
-Airdrop location $(x_l, y_l)$ available in clear, node location $(x_n, y_n)$ hidden (committed),
-acceptable maximum distance $d$ from node to airdrop,
-setup: group description and parameters, group elements for making commitments,
-initial message, challenge and responces of a Schnorr-like protocol.
+A location based service publishes a location of interest. 
+The location is a geometric area. 
+
+A simple case is that of a circle with a central point and a radius. 
+
+The center of the circle is shared in the clear, $(x_l, y_l, z_l)$. 
+The radius of interest about this point is shared as a maximum distance $d$ from $(x_l, y_l, z_l)$. 
+
+The user's smartphone device or node is at location $(x_n, y_n, z_n )$. 
+The node keeps these coordinates a secret. 
+It shares a cryptographic commitment that can prove its location is within the geometry in question. 
+The procedure's setup requires a group description and parameters, selection of group elements for making commitments,
+an initial message, and for the interactive version a challenge and response of a Schnorr-like protocol.
+
+We then describe a non-interactive version. In this version we replace the challenge/response by using Fiat Shamir. 
 
 \subsection{Interactive proof}
 
-Interactive argument system about integers is designed
-with a group of a hidden order~\cite{},
-that is, order of the group is not available to the Prover.
-Inequality (not far from) statement is converted into equality
-with 4-squares Lagrange theorem (Lipmaa).
+This section presents the interactive version of the zero knowledge proof. 
+
+The location geometry is considered as a range, and we have only to prove that the node is within the range. 
+We rely on Lagrange's classic result that every non-negative integer is a sum of four squares. 
+Lipmaa extended this into a non-interactive range proof. 
+
+A mathematical group is constructed that can support an interactive query with integers. 
+The order of the group is kept secret and remains unknown to the Prover.
+
 Schnorr proof was extended into a proof systems for polynomial relations
 with polynomials of higher degree in challenge
 for a number of applications~\cite{F363,CF12}.
+
 A comparable proof system for integers was introduced at~\cite{F10}.
 
 \subsection{Proof setup}
@@ -121,7 +161,7 @@ Protocol runs as follows:
 \\
 \hline
 \end{tabular}
-\caption{Private location verification protocol}
+\caption{Private location verification protocol, interactive version}
 \label{fig}
 \end{figure}
 
@@ -144,5 +184,8 @@ To facilitate larger proof-of-concept application, a temporary approximate solut
 % \bibliographystyle{splncs}
 \bibliography{private_location_verification}
 
+%TO BE FORMATTTED
+References: [ref1] Data Minimization Paper from W3C by Wolberger et al in publication
+[ref3] dscout mobile touches 2016
 %\appendix
 \end{document}
