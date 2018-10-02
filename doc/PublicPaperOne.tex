@@ -10,7 +10,6 @@
 \maketitle
 
 \abstract{
-
 Location based services (LBS) rely on users' disclosing their location. 
 A zero knowledge procedure is proposed where a user provides a commitment that can be verified to show that the user is within a perimeter. 
 
@@ -18,7 +17,7 @@ The simplest perimeter is a circle with radius R. The simplest polygon is a tria
 The procedure is then shown to work for an arbitrary perimeter consisting of n points. 
 
 This proof is sufficient for many LBS, and preserves the users privacy. 
-
+}
 \section{Introduction}
 
 Location based services (LBS) are a multimillion dollar market.
@@ -104,44 +103,48 @@ Multiplicative group of residue classes, RSA-like modulus.
 
 Common input of Prover and Verifier is
   commitment $s_U$ to node location~\eqref{cmt-up},
-  airdrop location $(x_l, y_l)$,
-  threshold $d^2$,
-  and parameres $(g, g_x, g_y, g_r, h_j)$:
+  airdrop location $(x_l, y_l, z_l)$ and
+  threshold $d^2$ (integers),
+  parameres $(N, g, g_x, g_y, g_z, g_r, \{h_j\})$.
 \begin{gather}
 \label{cmt-up}
-  s_U = g_x^{x_n} g_y^{y_n} g^{r}
+  s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r} \pmod{N}
 \end{gather}
 Private input of Prover is
-  node location $(x_n, y_n)$ and location commitment randomness~$r$,
-  four numbers~$\{a_j\}$ calculated with Rabin-Shallit algorithm according to~\eqref{eq-distn}.
+  node location $(x_n, y_n, z_n)$ (integers) and location commitment randomness~$r$,
+  four numbers~$\{a_j\}$ calculated
+% with Rabin-Shallit algorithm
+  according to~\eqref{eq-distn}.
+\\
 Statement being proved is
 \begin{gather}
 \label{eq-distn}
-  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2) = \sum_{j=1}^4 a_j^2
+  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2) + (z_n - z_l)^2) = \sum_{j=1}^4 a_j^2
 \end{gather}
 Protocol runs as follows:
 \begin{enumerate}
 \item
-  Prover picks random $\alpha_j, \eta, \gamma, \beta_x, \beta_y, \beta_r, \rho_0, \rho_1$,
-  computes $f_0, f_1$, and sends initial commitments $b_0, b_1, t_a, t_n$:
+  Prover picks random $\{\alpha_j\}, \eta, \gamma, \beta_x, \beta_y, \beta_z, \beta_r, \rho_0, \rho_1$,
+  produces $f_0, f_1$, sends $b_0, b_1, t_a, s_a, t_n$:
 \begin{gather}
-  f_0 = -(\beta_x^2 + \beta_y^2) - \sum_{j=1}^4 \alpha_j^2,   \;
-  f_1 = -2( (x_n - x_l) \beta_x  + (y_n - y_l) \beta_y) -2 \sum_{j=1}^4 a_j \alpha_j   \\
+  f_0 = -(\beta_x^2 + \beta_y^2 + \beta_z^2) - \sum_{j=1}^4 \alpha_j^2   \\
+  f_1 = -( (x_n - x_l) \beta_x  + (y_n - y_l) \beta_y  + (z_n - z_l) \beta_z) - \sum_{j=1}^4 a_j \alpha_j   \\
 %
-  t_n = g_x^{\beta_x} g_y^{\beta_y} g^{\beta_r} ,   \;
+  t_n = g_x^{\beta_x} g_y^{\beta_y} g_z^{\beta_z} g^{\beta_r} ,   \;
   s_a = g^{\gamma} \prod_{j=1}^4 h_j^{a_j},   \;
-  t_a = g^{\eta} \prod_{j=1}^4 h_j^{\alpha_j}, \;
+  t_a = g^{\eta} \prod_{j=1}^4 h_j^{\alpha_j} \\
   b_0 = g^{f_0} g_r^{\rho_0},  \;
-  b_1 = g^{f_1} g_r^{\rho_1}
+  b_1 = g^{2 f_1} g_r^{\rho_1} \pmod{N}
 \end{gather}
 %
 \item
   Verifier chooses and sends his challenge $c$
 \item
-  Prover computes and sends responses
+  Prover produces and sends responses
 \begin{gather}
   X_n = c x_n + \beta_x,  \;
   Y_n = c y_n + \beta_y,  \;
+  Z_n = c z_n + \beta_z,  \;
   R = c r + \beta_r   \\
   A_j = c a_j + \alpha_j, \;
   R_a = c \gamma + \eta,   \;
@@ -152,17 +155,87 @@ Protocol runs as follows:
   Verifier accepts if
 \begin{gather}
 \label{verf-linear}
-  g_x^{X_n} g_y^{Y_n} g^{R} s_U^{-c} = t_n, \quad
+  g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{-c} = t_n, \quad
   g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{-c} = t_a \\
 \label{verf-distn}
-  g^{c^2 d^2 - ((X_n - c x_l)^2 + (Y_n - c y_l)^2) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} g_r^{R_d} = b_1^{c} b_0
+  g^{c^2 d^2 - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} g_r^{R_d} = b_1^{c} b_0  \pmod{N}
 \end{gather}
 \end{enumerate}
 \\
 \hline
 \end{tabular}
 \caption{Private location verification protocol, interactive version}
-\label{fig}
+\label{ip_fig}
+\end{figure}
+
+\subsection {Non-Interactive proof}
+\begin{figure}[!htb]
+\begin{tabular}{|p{\linewidth}|}
+\hline
+
+Input of Prover is
+  location commitment~$s_U$~\eqref{cmt-up},
+  location $(x_n, y_n, z_n)$ and random $r$ to open this commitment,
+  airdrop location $(x_l, y_l, z_l)$,
+  threshold $d^2$,
+  parameres $(N, g, g_x, g_y, g_z, g_r, h_j)$.
+\\
+Non-interactive proof is produced as follows:
+\begin{enumerate}
+\item
+  Prover calculates $a_1 \dots a_4$ from locations and threshold,
+  picks random $\{\alpha_j\}, \eta, \gamma, \beta_x, \beta_y, \beta_z, \beta_r, \rho_0, \rho_1$,
+  produces $t_n, s_a, t_a, b_0, b_1$:
+\begin{gather}
+  t_n = g_x^{\beta_x} g_y^{\beta_y} g_z^{\beta_z} g^{\beta_r}, \;
+  s_a = g^{\gamma} (\prod_{j=1}^4 h_j^{a_j}),  \;
+  t_a = g^{\eta} (\prod_{j=1}^4 h_j^{\alpha_j}) \pmod{N}
+\end{gather}
+\begin{gather}
+  \tilde f_0 = \beta_x^2 + \beta_y^2 +\beta_z^2 + \alpha_1^2 + \alpha_2^2 + \alpha_3^2 + \alpha_4^2  \\
+  \tilde f_1 = (x_n - x_l) \beta_x  + (y_n - y_l) \beta_y  + (z_n - z_l) \beta_z + a_1 \alpha_1 + a_2 \alpha_2 + a_3 \alpha_3 + a_4 \alpha_4 \\
+  b_0 = g^{\tilde f_0} g_r^{\rho_0},   \quad
+  b_1 = g^{2 \tilde f_1} g_r^{\rho_1} \pmod{N}
+\end{gather}
+
+\item
+  Prover produces his challenge with a hash function:
+\begin{gather}
+  c = H(t_n || s_a || t_a || b_1 || b_0 || s_U)
+\end{gather}
+
+\item
+  Prover produces responses:
+\begin{multline}
+  X_n = -c x_n + \beta_x,  \;
+  Y_n = -c y_n + \beta_y,  \;
+  Z_n = -c z_n + \beta_z,   \;
+  R = -c r + \beta_r   \\
+  A_j = -c a_j + \alpha_j, \;
+  R_a = -c \gamma + \eta,   \;
+  R_d = -c \rho_1 + \rho_0
+\end{multline}
+\end{enumerate}
+Non-interactive proof is
+$(c, X_n, Y_n, Z_n, R, \{A_j\}, R_a, R_d, s_a, b_1)$.
+\\
+Proof verification:
+\begin{multline}
+\label{verf-chash}
+  F_d = ((X_n + c x_l)^2 + (Y_n + c y_l)^2 + (Z_n + c z_l)^2) + (A_1^2 + A_2^2 + A_3^2 + A_4^2) - c^2 d^2 \\
+  H(g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{c} ||
+    s_a ||
+    g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{c} ||
+    b_1 ||
+    g^{F_d} g_r^{R_d} b_1^c ||
+    s_U)
+  = c
+\end{multline}
+\\
+\hline
+\end{tabular}
+\caption{Location proof generation and verification, non-interactive version}
+\label{ni_fig}
 \end{figure}
 
 \subsection{Security properties}
@@ -179,6 +252,9 @@ Producing four-squares witness~\cite{PollackTrevino} is a work in progress, and 
 To facilitate larger proof-of-concept application, a temporary approximate solution was introduced producing four squares.
 
 \section{Discussion and Conclusion}
+
+We have shown how a node can keep its location secret, yet allow a verifier to prove that the secret location is within a perimeter.
+We offer two methods to do so: interactive and non-interactive.
 
 \bibliographystyle{plain}
 % \bibliographystyle{splncs}
