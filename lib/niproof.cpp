@@ -11,6 +11,8 @@
 
 //#define DBG_NICHALLENGE
 //#define DBG_SERIALIZE
+//#define DBG_PUBINFO
+
 std::string integer_to_string(CryptoPP::Integer integer) {
     std::string retVal;
     retVal.resize(integer.MinEncodedSize());
@@ -51,7 +53,7 @@ void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &
   ic.b_1 = CreateNCommitment(pp, privpf.f_1, privpf.rho_1);
 }
 
-CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U) {
+CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U, const std::string aux) {
   CryptoPP::byte h_img[CryptoPP::SHA256::DIGESTSIZE]; //20 bytes of result hash, or 30 for sha256 - result of this function
   CryptoPP::SHA256 hashf;
   
@@ -60,7 +62,7 @@ CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoP
       integer_to_string(ic.t_a) + "." +
       integer_to_string(ic.b_1) + "." +
       integer_to_string(ic.b_0) + "." +
-      integer_to_string(s_U) + ".";
+      integer_to_string(s_U) + "." + aux;
 
   CryptoPP::byte *pimg = (CryptoPP::byte *) var.c_str();
 
@@ -112,7 +114,13 @@ std::string ni_proof_create(const double xn, const double yn, const double zn, c
   InitialCommitments ic;
   Responses resp;
   CryptoPP::Integer c;
+  std::string pubinfo = pubcoords(xl, yl, zl, d);
 
+#ifdef DBG_PUBINFO
+  std::cout << "Pubinfo create: "
+	    << pubinfo
+	    << std::endl;
+#endif
   init_parameters(parm);
 
   // set coordinates in privi
@@ -134,7 +142,7 @@ std::string ni_proof_create(const double xn, const double yn, const double zn, c
 
   // alpha[4], eta, rho_0, rho_1, beta_x, beta_y, beta_z, f_0, f_1
   ni_proof_initial(ic, privi, privpf, pubi, parm);
-  c = ni_proof_challenge(ic, pubi.s_U);
+  c = ni_proof_challenge(ic, pubi.s_U, pubinfo);
   ni_proof_responses(resp, c, privi, privpf);
   ni_proof_serialize(proof, ic, c, resp, pubi.s_U, pubi.d2);
   return proof;
@@ -205,17 +213,31 @@ void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, Cryp
   d2 = args[14];
 }
 
-bool ni_proof_verify(const std::string proof) {
+bool ni_proof_verify(const std::string proof, const double xl, const double yl, const double zl, const double d) {
   Parameters parm;
   CryptoPP::Integer c, repr_c, s_U, d2;
   InitialCommitments re_ic;
   Responses resp;
+  std::string pubinfo = pubcoords(xl, yl, zl, d);
+
+#ifdef DBG_PUBINFO
+  std::cout << "Pubinfo verify: "
+	    << pubinfo
+	    << std::endl;
+#endif
 
   init_parameters(parm);
 
   ni_proof_deserialize(proof, re_ic, c, resp, s_U, d2);
   ni_reproduce_initial(c, s_U, d2, re_ic, resp, parm);
-  repr_c = ni_proof_challenge(re_ic, s_U);
+  repr_c = ni_proof_challenge(re_ic, s_U, pubinfo);
 
-  return repr_c == c;
+  return (repr_c == c & d2 <= d*d);
+}
+
+std::string pubcoords(const double xl, const double yl, const double zl, const double d) {
+  return std::to_string(xl) + ":" +
+         std::to_string(yl) + ":" +
+         std::to_string(zl) + ":" +
+         std::to_string(d);
 }

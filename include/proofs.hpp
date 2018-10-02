@@ -30,7 +30,7 @@
  * Proof is encoded as a string.
  */
 std::string ni_proof_create(const double xn, const double yn, const double zn, const double xl, const double yl, const double zl, const double d);
-bool ni_proof_verify(const std::string proof);
+bool ni_proof_verify(const std::string proof, const double xl, const double yl, const double zl, const double d);
 
 class GInt {
 public:
@@ -109,7 +109,7 @@ public:
 
 void init_parameters(Parameters &parm);
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp);
-CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U);
+CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U, const std::string aux);
 void ni_proof_responses(Responses &resp, const CryptoPP::Integer &c, const PrivateInfo &privi, const ProofPrivate &privpf);
 
 void ni_reproduce_initial(const CryptoPP::Integer c, const CryptoPP::Integer s_U, const CryptoPP::Integer d2, InitialCommitments &ic, const Responses &resp, const Parameters &parm);
@@ -129,3 +129,5 @@ long geo_z(double dlz);
 #define NIPROOF_COMPONENTS 15
 void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const CryptoPP::Integer &c, const Responses &resp, const CryptoPP::Integer &s_U, const CryptoPP::Integer &d2);
 void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, CryptoPP::Integer &c, Responses &resp, CryptoPP::Integer &s_U, CryptoPP::Integer &d2);
+
+std::string pubcoords(const double xl, const double yl, const double zl, const double d);

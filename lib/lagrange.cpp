@@ -10,24 +10,24 @@
 //#define DBG_APPROXA4
 
 long get_airdrop_radius(PublicInfo &pubi, PrivateInfo &privi) {
-  long dist_ln, diff_dist_sq, approx;
+  long dist_sq, diff_dist, approx;
   CryptoPP::Integer d2 =
     (privi.x - pubi.x_l) * (privi.x - pubi.x_l) +
     (privi.y - pubi.y_l) * (privi.y - pubi.y_l) +
     (privi.z - pubi.z_l) * (privi.z - pubi.z_l);
-  dist_ln = d2.ConvertToLong();
-  diff_dist_sq = pubi.radius * pubi.radius - dist_ln;
+  dist_sq = d2.ConvertToLong();
+  diff_dist = pubi.radius * pubi.radius - dist_sq;
 
-  if(diff_dist_sq < 0) {
+  if(diff_dist < 0) {
     std::cout << "Distance is larger threshold: "
-	      << dist_ln << " - " << pubi.radius * pubi.radius << std::endl;
+	      << dist_sq << " - " << pubi.radius * pubi.radius << std::endl;
     return -1;
   }
 
   for(int j=0; j<4; j++) {  // calculate_A1_A2_A3_A4()
-    approx = sqrt(diff_dist_sq); // approximation by rounding while assigning to integer
+    approx = sqrt(diff_dist); // approximation by rounding while assigning to integer
     privi.a[j] = approx;
-    diff_dist_sq -= approx * approx;
+    diff_dist -= approx * approx;
 #ifdef DBG_APPROXA4
     std::cout << approx << std::endl;
 #endif
