@@ -1,4 +1,14 @@
+*.o
+*.so
+demoCircle
+test-niproof
 .idea
 *.iml
-demo.o
-demo
+*.cls
+*.bst
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*~
