@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 
   double xl = std::stod(argv[1]),
           yl = std::stod(argv[2]),
-          zl = 2.0,
+          zl = 0.0,
           d = std::stod(argv[3]);
 
   std::string proof = argv[4];

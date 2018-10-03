@@ -7,6 +7,7 @@
 // make cli_ni && ./cli_ni_proof 1 1 10000 1 1
 // make cli_ni && ./cli_ni_proof 44.0 21.0 38000.0 44.1 21.3
 // make cli_ni && ./cli_ni_proof 50.428938 30.559123 1000 50.428938 30.559123
+// make cli_ni && ./cli_ni_proof 50.428938 30.559123 1000 50.4299018 30.5595315
 int main(int argc, char **argv) {
   std::string proof;
 
@@ -17,11 +18,11 @@ int main(int argc, char **argv) {
 
   double xl = std::stod(argv[1]),
         yl = std::stod(argv[2]),
-        zl = 2.0,
+        zl = 0.0,
         d = std::stod(argv[3]),
         xn = std::stod(argv[4]),
         yn = std::stod(argv[5]),
-        zn = 3.9;
+        zn = 0.0;
 
   std::cout.precision(20);
 
