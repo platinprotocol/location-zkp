@@ -4,10 +4,16 @@
 #include "cryptopp/modarith.h"
 #include "proofs.hpp"
 
-// make cli_ni && ./cli_ni_proof 1 1 1 1 1
+// make cli_ni && ./cli_ni_proof 1 1 10000 1 1
 // make cli_ni && ./cli_ni_proof 44.0 21.0 38000.0 44.1 21.3
+// make cli_ni && ./cli_ni_proof 50.428938 30.559123 1000 50.428938 30.559123
 int main(int argc, char **argv) {
   std::string proof;
+
+  if(argc != 6) {
+       std::cerr << "Wrong argument to cli_ni_proof. Expected args: xl yl d xn yn (coordinates are in decimal degrees)" << std::endl;
+       return 1;
+  }
 
   double xl = std::stod(argv[1]),
         yl = std::stod(argv[2]),
@@ -17,14 +23,22 @@ int main(int argc, char **argv) {
         yn = std::stod(argv[5]),
         zn = 3.9;
 
-  if(argc != 6) {
-       std::cerr << "Wrong argument to cli_ni_proof. Expected args: xl yl d xn yn (coordinates are in decimal degrees)" << std::endl;
-       return 1;
-  }
+  std::cout.precision(20);
+
+  std::cout << "xl: " << xl << std::endl;
+  std::cout << "yl: " << yl << std::endl;
+  std::cout << "d: " << d << std::endl;
+  std::cout << "xn: " << xn << std::endl;
+  std::cout << "yn: " << yn << std::endl;
 
   proof = ni_proof_create(xn, yn, zn, xl, yl, zl, d);
 
   std::cout << "generated_proof_value: " << proof << std::endl;
+
+  bool ok = ni_proof_verify(proof, xl, yl, zl, d);
+
+  std::cout << "self_check_result_int: " << ok << std::endl;
+  std::cout << "self_check_result_bool: " << (ok == 1 ?  "true" : "false")<< std::endl << std::flush;
 
   return 0;
 }
