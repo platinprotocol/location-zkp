@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
         yn = std::stod(argv[5]),
         zn = 0.0;
 
-  std::cout.precision(20);
+  std::cout.precision(10);
 
   std::cout << "xl: " << xl << std::endl;
   std::cout << "yl: " << yl << std::endl;

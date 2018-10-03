@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
   std::string proof = argv[4];
   bool ok;
 
-  std::cout.precision(20);
+  std::cout.precision(10);
 
   std::cout << "xl: " << xl << std::endl;
   std::cout << "yl: " << yl << std::endl;
