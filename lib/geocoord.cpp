@@ -15,7 +15,7 @@
 
 // (node - airdrop); X direction is to south pole
 long geo_x(double dlx) {
-  long intx = R_earch * GradToRad * dlx + 0.5 + 20000;
+  long intx = R_earch * GradToRad * dlx + 0.5;
 #ifdef DBG_GEOCOORD
   std::cout << "int_x: " << intx << std::endl;
 #endif
@@ -25,7 +25,7 @@ long geo_x(double dlx) {
 
 // Y is to Greenwich
 long geo_y(double dly, double org_latitude) {
-  long inty = R_earch * GradToRad * dly * cos(GradToRad * org_latitude) + 0.5 + 20000;
+  long inty = R_earch * GradToRad * dly * cos(GradToRad * org_latitude) + 0.5;
 #ifdef DBG_GEOCOORD
   std::cout << "int_y: " << inty << std::endl;
 #endif
