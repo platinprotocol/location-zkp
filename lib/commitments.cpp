@@ -6,7 +6,7 @@
 #include <iostream>
 #include "proofs.hpp"
 
-//#define NEED_NEGEXP
+#define NEED_NEGEXP
 #define DBG_NEGEXP
 //#define DBG_LOCCOMM
 //#define DBG_ACOMM
