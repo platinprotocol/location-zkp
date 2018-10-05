@@ -7,8 +7,8 @@
 #include <iostream>
 #include "proofs.hpp"
 
-#define DBG_GEOCOORD
-#define DBG_ABSXY
+//#define DBG_GEOCOORD
+//#define DBG_ABSXY
 
 // Earth radius, meters
 #define R_earch 6371000.

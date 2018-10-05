@@ -7,7 +7,7 @@
 #include "proofs.hpp"
 
 #define NEED_NEGEXP
-#define DBG_NEGEXP
+//#define DBG_NEGEXP
 //#define DBG_LOCCOMM
 //#define DBG_ACOMM
 //#define DBG_NCOMM
@@ -36,7 +36,7 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
           pp.group.Multiply(
              neg_a_exp_b_mod_c(pp.gy, y, pp.group),
              pp.group.Multiply(
-                neg_a_exp_b_mod_c(pp.gz, z, pp.gz),
+                neg_a_exp_b_mod_c(pp.gz, z, pp.group),
                 neg_a_exp_b_mod_c(pp.gr, r, pp.group))));
 #else // need negative
 #ifdef DBG_NEGEXP
@@ -50,7 +50,6 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
     return CryptoPP::Integer::Zero();
   }
 #endif // debug negative
-#endif // need negative
   s = pp.group.Multiply(
 	  pp.group.Exponentiate(pp.gx, x),
 	  pp.group.Multiply(
@@ -58,6 +57,7 @@ CryptoPP::Integer CreateCommitment(const Parameters &pp, const CryptoPP::Integer
              pp.group.Multiply(
 		pp.group.Exponentiate(pp.gz, z),
                 pp.group.Exponentiate(pp.gr, r))));
+#endif // need negative
 
 #ifdef DBG_LOCCOMM
   std::cout << "x " << x << " y " << y << " z " << z << " r " << r << std::endl;
