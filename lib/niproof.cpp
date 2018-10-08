@@ -12,6 +12,7 @@
 //#define DBG_NICHALLENGE
 //#define DBG_SERIALIZE
 //#define DBG_PUBINFO
+//#define DBG_TEXTHASH
 
 std::string integer_to_string(CryptoPP::Integer integer) {
     std::string retVal;
@@ -56,7 +57,13 @@ void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &
 CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U, const std::string aux) {
   CryptoPP::byte h_img[CryptoPP::SHA256::DIGESTSIZE]; //20 bytes of result hash, or 30 for sha256 - result of this function
   CryptoPP::SHA256 hashf;
-  
+
+#ifdef DBG_TEXTHASH
+  std::stringstream cpreimg;
+  cpreimg << ic.t_n << ic.s_a << ic.t_a << ic.b_1 << ic.b_0 << s_U; //concatenate numbers into single string so that we can push that into hash function.
+  CryptoPP::byte *pimg = (CryptoPP::byte *) cpreimg.str().c_str();
+  int sz = strlen(cpreimg.str().c_str());
+#else
   std::string var = integer_to_string(ic.t_n) + "." +
       integer_to_string(ic.s_a) + "." +
       integer_to_string(ic.t_a) + "." +
@@ -67,7 +74,7 @@ CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoP
   CryptoPP::byte *pimg = (CryptoPP::byte *) var.c_str();
 
   unsigned long sz =  var.length();
-    
+#endif
   hashf.CalculateDigest(h_img, pimg, sz); //calculating hash, result printed into h_img
   
   // explicit conversion into a bignumber, byte by byte
@@ -80,7 +87,11 @@ CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoP
 #ifdef DBG_NICHALLENGE
   std::cout << "FS challenge: "
         << sz << "  "
+#ifdef DBG_TEXTHASH
+        << cpreimg.str()
+#else
         << var.c_str()
+#endif
         << "  int: " << c << std::endl;
 #endif
   return c;
