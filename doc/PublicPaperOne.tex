@@ -1,98 +1,50 @@
 \documentclass{article}
 % \documentclass{llncs}
-\usepackage{amsmath,amsfonts,url}
+\usepackage{amsmath,amsfonts,url,graphicx,xcolor}
+% \graphicspath{ {./images/} }
 
 \begin{document}
+\definecolor{yellow}{HTML}{FFFBEB}
+\pagecolor{yellow}
 
-\title{Private Location Verification}
+
+\title{
+	Zero Knowledge Proof of Location\\
+	\small{
+	Platin Yellow Paper\\
+	Draft}
+}
 \author{Lionel Wolberger, Vadym Fedyukovych}
 % \institute{Platin.io}
 \maketitle
 
 \abstract{
-Many location based services authorize a user by assessing whether or not the user is within a given range of the service. To assess this range these systems request the user's geographical coordinates and often store them for later analysis. A system is proposed where the service authorization is based on a zero knowledge verification of a commitment. The commitment has no statement of the geographical coordinates, yet can be reliably verified to prove that the user is within range of the service eligibility. The service has the assurance required to deliver the service while having zero knowledge of the user's geographical coordinates.
-
-This paper shares the ZK procedure for a circle with radius R. A non-interactive and interactive protocol is defined that works for any arbitrary location in relation to this circle. This proof is sufficient for many use cases and preserves the users privacy. 
-
+Many location based services authorize a user by assessing whether or not the user is within a given range of the service. To assess this range, systems request the user's geospatial coordinates, and often store them for later analysis. We describe a system where the service authorization is based on a zero knowledge verification of a commitment. The commitment has no geographical coordinate data, yet can be reliably verified to prove that the user is within range of the service eligibility. The service has the assurance required to deliver the service while having zero knowledge of the user's geographical coordinates.
 }
-\section{Introduction}
+\section{Zero Knowledge Proof of Location}
 
-Location based services (LBS) are a multimillion dollar market.
-An LBS generally relies on a user's smartphone to disclose its location data, as people carry these devices with them almost everywhere, 
-use them over four hours each day on average, 
-and touch them over two thousand times a day ~\cite{dscout}
 
-While LBS are increasingly popular and expanding into many areas of our daily lives, there is a  parallel and counter trend towards increasing privacy. 
-Privacy preserving tactics such as Data Minimization, Selective Disclosure and Progressive Trust are increasingly expected to be applied to our digital interactions. ~\cite{CCGMDSDPT}
+The zero knowledge location We present two sets of equations illustrated with a diagram and followed by notes and decisions. 
 
-For example, a user may attempt to use an online service that asks him to share his location in order to prove his geolocation.
-The user may hesitate, since he knows that the service may share this information with other parties without meaningful consent on his part. 
+The diagram describes a circle with geometric radius R. A node positioned inside the circle can calculate a mathematical commitment and share it. In the "green" cases the difference is greater than zero, in the "red" cases it is less than zero. 
 
-Some LBS may not need a precise location, but only an assertion that the user is within a certain area. 
+The equations are presented in two sets and outline all steps required to perform the full procedure, from commitment to verification. A protocol is specified where a verifier can process that commitment and determine the difference. An interactive  and non-interactive protocol is defined, each presented as a series of equations. This proof is sufficient for many use cases, efficient, supports large scale analytics, and preserves users' privacy.
 
-This paper details a zero knowledge procedure to enable such assertions. 
-The user would share a cryptographic commitment rather than his exact location. 
-The commitment is validated, 
-and a proof is given that Diego is within a perimeter, 
-without revealing the secret of his actual location within this perimeter. 
+The notes and decisions section records issues related to the equations and diagram. Each note discusses a mathematical decision that we have made. Some of these decisions are not yet reflected in the equations and protocols shared in this paper. 
 
-This zero knowledge procedure is described below. 
+A git repository is associated with this paper. C++ reference code can be found there enabling testing and efficiency metrics. 
 
-\subsection{Our contribution}
 
-\section{Protocol}
-\subsection{Definitions}
+\begin{figure}[!htb]
+	\hspace*{-2cm}
+	\includegraphics[scale=.3]{zkp_range_proof}
+	\caption{Two users request authorization for a location based service. The center of the circle and its preset radius define the range within which users can be authorized for the service. With data known only to itself, each user calculates a mathematical commitment based on its radius, distance and difference.  For green the difference is greater than zero. For red the difference is less than zero. The mathematical commitment is verified without revealing the user's geospatial coordinates by applying the zero knowledge protocol below.}
+\end{figure}
 
-% Commitment, interactive proof system, witness indistinguishability and zero knowledge,
-% 'algebraic' interactive proofs,
-% proving relations about integers,
-% groups of hidden order,
-% Rabin-Shallit algorithm,
-% extending Schnorr protocol into higher degrees of challenge.
-% Proofs and arguments, completeness and soundness, of knowledge, zero knowledge and witness indistinguishability.
-% Hardness of factoring and finding group order, StrongRSA.
 
-\subsection{Notations}
 
-A location based service publishes a location of interest. 
-The location is bounded within a perimeter, or boundary. 
 
-A simple case is that of a circle with a central point and a radius. 
-
-The center of the circle is shared in the clear, $(x_l, y_l, z_l)$. 
-The radius of interest about this point is shared as a maximum distance $d$ from $(x_l, y_l, z_l)$. 
-
-The user's smartphone device or node is at location $(x_n, y_n, z_n )$. 
-The node keeps these coordinates a secret. 
-It shares a cryptographic commitment that can prove its location is within the geometry in question. 
-The procedure's setup requires a group description and parameters, selection of group elements for making commitments,
-an initial message, and for the interactive version a challenge and response of a Schnorr-like protocol.
-
-We then describe a non-interactive version. In this version we replace the challenge/response by using Fiat Shamir. 
-
-\subsection{Interactive proof}
-
-This section presents the interactive version of the zero knowledge proof. 
-
-The location geometry is considered as a range, and we have only to prove that the node is within the range. 
-We rely on Lagrange's classic result that every non-negative integer is a sum of four squares. 
-Lipmaa extended this into a non-interactive range proof. 
-
-A mathematical group is constructed that can support an interactive query with integers. 
-The order of the group is kept secret and remains unknown to the Prover.
-
-Schnorr proof was extended into a proof systems for polynomial relations
-with polynomials of higher degree in challenge
-for a number of applications~\cite{F363,CF12}.
-
-A comparable proof system for integers was introduced at~\cite{F10}.
-
-\subsection{Proof setup}
-
-We restrict ourselves to the use of integers, following the practice of Idemix~\cite{Idemix}.
-
-We setup a group based on quadratic residues, a property of numbers raised to the second power (squared) as they behave in modular arithmetic. The modulus is generated based on a safe RSA key pair. This constitutes a multiplicative group of residue classes, with an RSA-like modulus.
-
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[!htb]
 \begin{tabular}{|p{\linewidth}|}
 \hline
@@ -164,7 +116,7 @@ Protocol runs as follows:
 \label{ip_fig}
 \end{figure}
 
-\subsection {Non-Interactive proof}
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[!htb]
 \begin{tabular}{|p{\linewidth}|}
 \hline
@@ -237,25 +189,199 @@ Proof verification:
 \label{ni_fig}
 \end{figure}
 
-\subsection{Security properties}
 
-% Completeness and Soundness.
-% We reduce
 
-\section{Implementation}
+\section{Notes and Decisions}
 
-We have this protocol implemented on top of {Crypto++} library~\footnote{\url{https://cryptopp.com/}}
-serving as a bignumbers backend.
+Each note tackles an issue related to zero knowledge proofs of location. Some of these decisions are not reflected in the equations or protocols presented above. The notes relate generally to our work on the zero knowledge proof of location and their contents may be integrated with the main body of the paper in future. 
 
-Producing four-squares witness~\cite{PollackTrevino} is a work in progress, and is not a part of the protocol reported.
-To facilitate larger proof-of-concept application, a temporary approximate solution was introduced producing four squares.
+\subsection{Some Definitions}
+\label{sect-definitions}
+Node proves the statement "distance is within a threshold" (less or equal)
+for node coordinates $(x_n, y_n, z_n)$,
+given location $(x_l, y_l, z_l)$,
+and some threshold $d$ (all integers):
+\begin{gather}
+\label{eq-distn}
+d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
+\end{gather}
+We rely on 4-squares Lagrange theorem to prove equality statement (Lipmaa).
+Proofs for integer relations are possible in hidden group order setup.
 
+\subsection{Proof Setup}
+
+Let $g$ be a generator of a proper group of a hidden order,
+and $h$ be a group element (Pedersen commitment scheme).
+We use multiplicative group of invertible residue classes modulo a composite $n$ such that
+$n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes (Idemix).
 \cite{Idemix}
 
-\section{Discussion and Conclusion}
+\subsection{Signal Harvesting}
+Node picks random $(r_x, r_y, r_z)$, creates commitment $(s_x, s_y, s_z)$ to it's coordinates
+\begin{gather}
+\label{cmt-pedr}
+s_x = g^{x_n} h^{r_x},   \qquad
+s_y = g^{y_n} h^{r_y},   \qquad
+s_z = g^{z_n} h^{r_z}
+\end{gather}
+and keeps coordinates-randoms pairs
+$(x_n, y_n, z_n)$, $(r_x, r_y, r_z)$
+private.
 
-We have shown how a node can keep its location secret, yet allow a verifier to prove that the secret location is within a perimeter.
-We offer two methods to do so: interactive and non-interactive.
+This section is of historical value only;
+'representation-based' commitment was implemented as a proof-of-concept.
+
+\subsection{Representation-Based Commitment}
+Following U-Prove, consider commitment scheme resulting in a single group element:
+\begin{gather}
+\label{cmt-up}
+s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r}
+\end{gather}
+where $g_x, g_y, g_z$ are group elements, and $r$ is a random.
+This scheme admits a proof of knowledge with the same responses required form threshold location verification.
+This scheme can be extended with additional components. % like set of wireless station% name-power pairs.
+
+\subsection{Two-Level Commitment}
+To achieve expected properties of Merkle-tree based scheme while keeping an option
+to run location proof protocols,
+representation-based commitments could be leaves of Merkle tree.
+
+\subsection{A Proof}
+\label{sect-close}
+Sigma-protocol with 3 messages.
+Public information is node location commitment~\eqref{cmt-up}, given location and threshold (center and radius), proof parameters.
+Private information is node location and randomness to commitment.
+Setup is $g, h_1 \dots h_4, g_x, g_y, g_z, g_r$
+(9 group elements).
+
+\begin{enumerate}
+	\item
+	Prover (node) calculates~\eqref{eq-distn} $a_1 \dots a_4$ from locations and threshold
+	with Rabin-Shallit algorithm~\footnote{Before R-S algorithm is implemented,
+		we actually pick some $a_j$ and calculate threshold (radius) instead.},
+	picks random $\alpha_j, \eta, \gamma, \beta_x, \beta_y, \beta_z, \beta_r, \rho_0, \rho_1$, %, \eta_x, \eta_y, \eta_z$,
+	computes and sends initial commitments $b_0, b_1, t_a, t_n$ \\
+	($f_0$ and $f_1$ are explained at Background section)
+	\begin{gather}
+	b_0 = g^{f_0} g_r^{\rho_0},   \qquad
+	b_1 = g^{f_1} g_r^{\rho_1}    \\
+	s_a = g^{\gamma} \prod_{j=1}^4 h_j^{a_j},   \qquad
+	t_a = g^{\eta} \prod_{j=1}^4 h_j^{\alpha_j} ,   \qquad
+	t_n = g_x^{\beta_x} g_y^{\beta_y} g_z^{\beta_z} g^{\beta_r}
+	%  t_y = g^{\beta_y} h^{\eta_y},   \qquad
+	%  t_z = g^{\beta_z} h^{\eta_z}
+	\end{gather}
+	
+	\item
+	Verifier chooses and sends his challenge $c$
+	\item
+	Prover computes and sends responses
+	\begin{gather}
+	%  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) =
+	X_n = c x_n + \beta_x,  \;
+	Y_n = c y_n + \beta_y,  \;
+	Z_n = c z_n + \beta_z,   \;
+	R = c r + \beta_r   \\
+	A_j = c a_j + \alpha_j, \;
+	R_a = c \gamma + \eta,   \;
+	R_d = c \rho_1 + \rho_0
+	\end{gather}
+	
+	\item
+	Proof verification
+	\begin{gather}
+	\label{verf-linear}
+	g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{-c} = t_n, \quad
+	g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{-c} = t_a \\
+	%
+	\label{verf-distn}
+	g^{c^2 d^2 - ((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} g_r^{R_d} = b_1^{c} b_0
+	%  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
+	\end{gather}
+	
+\end{enumerate}
+
+\subsection{Quadratic Polynomial, Background}
+
+Consider quadratic (degree 2 in $v$) polynomial
+\begin{multline}
+f_V(v) = f_2 v^2 + f_1 v + f_0 = \\
+v^2 d^2 - (((v x_n + \beta_x) - v x_l)^2 +
+((v y_n + \beta_y) - v y_l)^2 +
+((v z_n + \beta_z) - v z_l)^2)  \\
+- ((v a_1 + \alpha_1)^2 +
+(v a_2 + \alpha_2)^2 +
+(v a_3 + \alpha_3)^2 +
+(v a_4 + \alpha_4)^2)
+\end{multline}
+This polynomial is actually linear ($f_2 = 0$, degree-one in $v$)
+if, and only if
+statement about distance~\eqref{eq-distn} holds for node coordinates that are hidden from verifier.
+We evaluate this polynomial at a random point chosen as the challenge of verifier.
+It follows, distance verification equation~\eqref{verf-distn}
+only needs constant $b_0$ and degree-one $b_1^c$ components.
+\begin{gather}
+f_0 = -\beta_x^2 - \beta_y^2 - \beta_z^2 - \alpha_1^2 - \alpha_2^2 - \alpha_3^2 - \alpha_4^2
+\end{gather}
+\begin{multline}
+f_1 = -2 (x_n - x_l) \beta_x  -2 (y_n - y_l) \beta_y  -2 (z_n - z_l) \beta_z \\
+-2 a_1 \alpha_1 -2 a_2 \alpha_2 -2 a_3 \alpha_3 -2 a_4 \alpha_4
+\end{multline}
+Prover calculates $b_0, b_1$ from $f_0, f_1$.
+
+\subsection{Not-at-Location Proof}
+
+Proving a negative location statement is a valid usecase,
+that could be demonstrated with ``not at the grocery store'' scenario.
+Rather that proving ``distance is smaller than''~\eqref{eq-distn},
+complementary ``is larger'' proof is given. % as follows:
+In the following, we only show changes required to the main protocol.
+\begin{gather}
+\label{eq-distn-more}
+((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) - d^2 = a_1^2 + a_2^2 + a_3^2 + a_4^2  \\
+\label{verf-distn-more}
+g^{((X_n - c x_l)^2 + (Y_n - c y_l)^2 + (Z_n - c z_l)^2 ) - c^2 d^2 - (A_1^2 + A_2^2 + A_3^2 + A_4^2)} h^{R_a} = b_1^{c} b_0 
+\end{gather}
+\begin{multline}
+\label{eq-coeff-more}
+f_V(v) = f_2 v^2 + f_1 v + f_0 = \\
+(((v x_n + \beta_x) - v x_l)^2 +
+((v y_n + \beta_y) - v y_l)^2 +
+((v z_n + \beta_z) - v z_l)^2)
+- v^2 d^2 \\
+- ((v a_1 + \alpha_1)^2 +
+(v a_2 + \alpha_2)^2 +
+(v a_3 + \alpha_3)^2 +
+(v a_4 + \alpha_4)^2)
+\end{multline}
+
+\subsection{Logical-OR Threshold Location}
+
+Consider a franchise operating multiple stores,
+and a usecase of proving location is ``at Starbucks'' without telling which one of $K$ known.
+We define each such store with it's center $(x_k, y_k, z_k)$ and radius (size)~$d_k$, $k \in [1 .. K]$.
+We elaborate basic threshold proof such that prover can produce
+4-squares representation for center-size of some store $k=p$,
+and pick arbitrary 4-tuples for all other stores $k \ne p$.
+\begin{multline}
+\label{eq-distn-or}
+\prod_{k=1}
+((d_k^2 - ((x_n - x_k)^2 + (y_n - y_k)^2 + (z_n - z_k)^2) \\
+- (a_{1, k}^2 + a_{2, k}^2 + a_{3, k}^2 + a_{4, k}^2)) = 0
+\end{multline}
+Verifier is testing that polynomial $f_{KV}(v)$ is of degree at most $2K-1$, not $2K$.
+\begin{multline}
+f_{KV}(v) = \sum_{j=0}^{2K} f_j v^j = \\
+\prod_{k=1}^{K} (
+v^2 d_k^2 - (((v x_n + \beta_x) - v x_k)^2 +
+((v y_n + \beta_y) - v y_k)^2 +
+((v z_n + \beta_z) - v z_k)^2)  \\
+- ((v a_{1,k} + \alpha_1)^2 +
+(v a_{2,k} + \alpha_2)^2 +
+(v a_{3,k} + \alpha_3)^2 +
+(v a_{4,k} + \alpha_4)^2) )
+\end{multline}
+
 
 \bibliographystyle{plain}
 % \bibliographystyle{splncs}
