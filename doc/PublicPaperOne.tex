@@ -23,22 +23,23 @@ Many location based services authorize a user by assessing whether or not the us
 }
 \section{Zero Knowledge Proof of Location}
 
+We present two sets of equations, a graphical illustration, followed by notes and decisions. 
 
-The zero knowledge location We present two sets of equations illustrated with a diagram and followed by notes and decisions. 
+The illustration describes a location based service with a radius that defines the range of that service. Two users are shown colored green and red, the green user inside the radius and the red user, outside. The diagram illustrates parameters that are significant to the zero knowledge proof. 
 
-The diagram describes a circle with geometric radius R. A node positioned inside the circle can calculate a mathematical commitment and share it. In the "green" cases the difference is greater than zero, in the "red" cases it is less than zero. 
+The equations are presented in two sets and specify the steps required to perform the full protocol, from commitment to verification. This protocol enables a verifier to process a commitment and determine the difference, which reflects whether the commitment reflects a position inside or outside the radius of the service area. Both interactive  and non-interactive protocols are defined, each presented as a series of equations. 
 
-The equations are presented in two sets and outline all steps required to perform the full procedure, from commitment to verification. A protocol is specified where a verifier can process that commitment and determine the difference. An interactive  and non-interactive protocol is defined, each presented as a series of equations. This proof is sufficient for many use cases, efficient, supports large scale analytics, and preserves users' privacy.
-
-The notes and decisions section records issues related to the equations and diagram. Each note discusses a mathematical decision that we have made. Some of these decisions are not yet reflected in the equations and protocols shared in this paper. 
+The notes and decisions section records issues related to the protocol and illustration. Each note discusses a mathematical decision that we have made. Some of these decisions are not yet reflected in the equations and protocols shared in this paper. 
 
 A git repository is associated with this paper. C++ reference code can be found there enabling testing and efficiency metrics. 
+
+This zero knowledge proof of location protocol is sufficient for many use cases, efficient, supports large scale analytics, and preserves users' privacy.g
 
 
 \begin{figure}[!htb]
 	\hspace*{-2cm}
 	\includegraphics[scale=.3]{zkp_range_proof}
-	\caption{Two users request authorization for a location based service. The center of the circle and its preset radius define the range within which users can be authorized for the service. With data known only to itself, each user calculates a mathematical commitment based on its radius, distance and difference.  For green the difference is greater than zero. For red the difference is less than zero. The mathematical commitment is verified without revealing the user's geospatial coordinates by applying the zero knowledge protocol below.}
+	\caption{Two users request authorization for a location based service. The center of the circle and its preset radius define a range within which users are to be authorized for the service. With data known only to itself, each user calculates a mathematical commitment based on its radius, distance and difference.  For green the difference is greater than zero. For red the difference is less than zero. The mathematical commitment is verified by applying the zero knowledge protocol below, without revealing the user's geospatial coordinates.}
 \end{figure}
 
 
@@ -193,7 +194,7 @@ Proof verification:
 
 \section{Notes and Decisions}
 
-Each note tackles an issue related to zero knowledge proofs of location. Some of these decisions are not reflected in the equations or protocols presented above. The notes relate generally to our work on the zero knowledge proof of location and their contents may be integrated with the main body of the paper in future. 
+Notes and decisions capture issues related to zero knowledge proofs of location and are presented in no particular order. Some of the topics discussed relate to our general approach to zero knowledge proofs, and do not directly reflect the equations or protocols above. The contents of notes and decisions may be integrated with the main body of the paper in future. 
 
 \subsection{Some Definitions}
 \label{sect-definitions}
@@ -329,7 +330,7 @@ f_1 = -2 (x_n - x_l) \beta_x  -2 (y_n - y_l) \beta_y  -2 (z_n - z_l) \beta_z \\
 \end{multline}
 Prover calculates $b_0, b_1$ from $f_0, f_1$.
 
-\subsection{Not-at-Location Proof}
+\subsection{A Not-at-Location Proof}
 
 Proving a negative location statement is a valid usecase,
 that could be demonstrated with ``not at the grocery store'' scenario.
