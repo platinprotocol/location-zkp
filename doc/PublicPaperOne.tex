@@ -10,13 +10,10 @@
 \maketitle
 
 \abstract{
-Location based services (LBS) rely on users' disclosing their location. 
-A zero knowledge procedure is proposed where a user provides a commitment that can be verified to show that the user is within a perimeter. 
+Many location based services authorize a user by assessing whether or not the user is within a given range of the service. To assess this range these systems request the user's geographical coordinates and often store them for later analysis. A system is proposed where the service authorization is based on a zero knowledge verification of a commitment. The commitment has no statement of the geographical coordinates, yet can be reliably verified to prove that the user is within range of the service eligibility. The service has the assurance required to deliver the service while having zero knowledge of the user's geographical coordinates.
 
-The simplest perimeter is a circle with radius R. The simplest polygon is a triangle. 
-The procedure is then shown to work for an arbitrary perimeter consisting of n points. 
+This paper shares the ZK procedure for a circle with radius R. A non-interactive and interactive protocol is defined that works for any arbitrary location in relation to this circle. This proof is sufficient for many use cases and preserves the users privacy. 
 
-This proof is sufficient for many LBS, and preserves the users privacy. 
 }
 \section{Introduction}
 
@@ -25,8 +22,7 @@ An LBS generally relies on a user's smartphone to disclose its location data, as
 use them over four hours each day on average, 
 and touch them over two thousand times a day ~\cite{dscout}
 
-While LBS are increasingly popular and expanding into many areas of our daily lives,
-there is a  parallel and counter trend towards increasing privacy. 
+While LBS are increasingly popular and expanding into many areas of our daily lives, there is a  parallel and counter trend towards increasing privacy. 
 Privacy preserving tactics such as Data Minimization, Selective Disclosure and Progressive Trust are increasingly expected to be applied to our digital interactions. ~\cite{CCGMDSDPT}
 
 For example, a user may attempt to use an online service that asks him to share his location in order to prove his geolocation.
