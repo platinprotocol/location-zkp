@@ -221,21 +221,6 @@ We use multiplicative group of invertible residue classes modulo a composite $n$
 $n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes (Idemix).
 \cite{Idemix}
 
-\subsection{Signal Harvesting}
-Node picks random $(r_x, r_y, r_z)$, creates commitment $(s_x, s_y, s_z)$ to it's coordinates
-\begin{gather}
-\label{cmt-pedr}
-s_x = g^{x_n} h^{r_x},   \qquad
-s_y = g^{y_n} h^{r_y},   \qquad
-s_z = g^{z_n} h^{r_z}
-\end{gather}
-and keeps coordinates-randoms pairs
-$(x_n, y_n, z_n)$, $(r_x, r_y, r_z)$
-private.
-
-This section is of historical value only;
-'representation-based' commitment was implemented as a proof-of-concept.
-
 \subsection{Representation-Based Commitment}
 Following U-Prove, consider commitment scheme resulting in a single group element:
 \begin{gather}
