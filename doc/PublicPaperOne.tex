@@ -41,8 +41,7 @@ The notes and decisions section records issues related to the protocol and illus
 Each note discusses a mathematical decision that we have made.
 Some of these decisions are not yet reflected in the equations and protocols shared in this paper. 
 
-A git repository is associated with this paper.
-C++ reference code can be found there enabling testing and efficiency metrics. 
+A git repository associated with this paper will be released. C++ reference code will be found there enabling testing and efficiency metrics. 
 
 This zero knowledge proof of location protocol is sufficient for many use cases, efficient, supports large scale analytics, and preserves users' privacy.
 
@@ -50,7 +49,7 @@ This zero knowledge proof of location protocol is sufficient for many use cases,
   \centering
   \def\svgwidth{\columnwidth}
   \input{range_proof.pdf_tex}
-\caption{Two users with a predefined radius. green node and a red node are positioned in relation to a circle with a predefined radius. The Pan airdrop is described by circular geometry with a center and radius. A node has three significant parameters: a distance, radius and difference.}
+\caption{A location based service is illustrated. The center of the circle and its preset radius define the range within which users are to be authorized for the service. Two users request authorization, colored green and red. With data known only to itself, each user calculates a mathematical commitment based on radius, distance and difference. For green the difference is greater than zero. For red the difference is less than zero. The mathematical commitment is verified by applying the zero knowledge protocol below, without revealing the user's geospatial coordinates.}
 \label{fig-rangeproof}
 \end{figure}
 
