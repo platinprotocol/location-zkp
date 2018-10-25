@@ -22,8 +22,8 @@
 Many location based services authorize a user by assessing whether or not the user is within a given range of the service.
 To assess this range, systems request the user's geospatial coordinates, and often store them for later analysis.
 We describe a system where the service authorization is based on a zero knowledge verification of a commitment.
-The commitment has no geographical coordinate data, yet can be reliably verified to prove that the user is within range of the service eligibility.
-The service has the assurance required to deliver the service while having zero knowledge of the user's geographical coordinates.
+The commitment has no geospatial coordinate data, yet can be reliably verified to prove that the user is within range of the service eligibility.
+The service has the assurance required to deliver the service while having zero knowledge of the user's geospatial coordinates.
 }
 \section{Zero Knowledge Proof of Location}
 
@@ -49,7 +49,7 @@ This zero knowledge proof of location protocol is sufficient for many use cases,
   \centering
   \def\svgwidth{\columnwidth}
   \input{range_proof.pdf_tex}
-\caption{A location based service is illustrated. The center of the circle and its preset radius define the range within which users are to be authorized for the service. Two users request authorization, colored green and red. With data known only to itself, each user calculates a mathematical commitment based on radius, distance and difference. For green the difference is greater than zero. For red the difference is less than zero. The mathematical commitment is verified by applying the zero knowledge protocol below, without revealing the user's geospatial coordinates.}
+\caption{A location based service is shown. The center of the circle and its preset radius define the range within which users are to be authorized for the service. Two users request authorization, colored green and red. With data known only to itself, each user calculates a mathematical commitment based on radius, distance and difference. For green the difference is greater than zero. For red the difference is less than zero. The mathematical commitment is verified by applying the zero knowledge protocol below, without revealing the user's geospatial coordinates.}
 \label{fig-rangeproof}
 \end{figure}
 
