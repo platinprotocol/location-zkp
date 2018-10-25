@@ -218,10 +218,10 @@ for node coordinates $(x_n, y_n, z_n)$,
 given location $(x_l, y_l, z_l)$,
 and some threshold $d$ (all integers):
 \begin{gather}
-\label{eq-distn}
-d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
+\label{eq-distn-cp}
+  d^2 - ((x_n - x_l)^2 + (y_n - y_l)^2 + (z_n - z_l)^2) = a_1^2 + a_2^2 + a_3^2 + a_4^2
 \end{gather}
-We rely on 4-squares Lagrange theorem to prove equality statement (Lipmaa).
+We rely on 4-squares Lagrange theorem to prove equality statement~\cite{Lipmaa03}.
 Proofs for integer relations are possible in hidden group order setup.
 
 \subsection{Proof Setup}
@@ -229,14 +229,13 @@ Proofs for integer relations are possible in hidden group order setup.
 Let $g$ be a generator of a proper group of a hidden order,
 and $h$ be a group element (Pedersen commitment scheme).
 We use multiplicative group of invertible residue classes modulo a composite $n$ such that
-$n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes (Idemix).
-\cite{Idemix}
+$n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes~\cite{Idemix}.
 
 \subsection{Representation-Based Commitment}
 Following U-Prove, consider commitment scheme resulting in a single group element:
 \begin{gather}
-\label{cmt-up}
-s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r}
+\label{cmt-up-cp}
+  s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r}
 \end{gather}
 where $g_x, g_y, g_z$ are group elements, and $r$ is a random.
 This scheme admits a proof of knowledge with the same responses required form threshold location verification.
@@ -251,7 +250,7 @@ representation-based commitments could be leaves of Merkle tree.
 
 Proving a negative location statement is a valid usecase,
 that could be demonstrated with ``not at the grocery store'' scenario.
-Rather that proving ``distance is smaller than''~\eqref{eq-distn},
+Rather that proving ``distance is smaller than''~\eqref{eq-distn-cp},
 complementary ``is larger'' proof is given. % as follows:
 In the following, we only show changes required to the main protocol.
 \begin{gather}
