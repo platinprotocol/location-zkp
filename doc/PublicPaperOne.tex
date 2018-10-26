@@ -172,27 +172,29 @@ Non-interactive proof is produced as follows:
 \item
   Prover produces responses:
 \begin{multline}
-  X_n = -c x_n + \beta_x,  \;
-  Y_n = -c y_n + \beta_y,  \;
-  Z_n = -c z_n + \beta_z,   \;
-  R = -c r + \beta_r   \\
-  A_j = -c a_j + \alpha_j, \;
-  R_a = -c \gamma + \eta,   \;
-  R_d = -c \rho_1 + \rho_0
+  \tilde X_n = -c x_n + \beta_x,  \;
+  \tilde Y_n = -c y_n + \beta_y,  \;
+  \tilde Z_n = -c z_n + \beta_z,   \;
+  \tilde R = -c r + \beta_r   \\
+  \tilde A_j = -c a_j + \alpha_j, \;
+  \tilde R_a = -c \gamma + \eta,   \;
+  \tilde R_d = -c \rho_1 + \rho_0
 \end{multline}
 \end{enumerate}
 Non-interactive proof is
-$(c, X_n, Y_n, Z_n, R, \{A_j\}, R_a, R_d, s_a, b_1)$.
+$(c, \tilde X_n, \tilde Y_n, \tilde Z_n, \tilde R, \{\tilde A_j\}, \tilde R_a, \tilde R_d, s_a, b_1)$.
 \\
-Proof verification:
+Proof verification:\\
+Verifier produces $F_d$ and then re-produces the challenge as follows
+%
 \begin{multline}
 \label{verf-chash}
-  F_d = ((X_n + c x_l)^2 + (Y_n + c y_l)^2 + (Z_n + c z_l)^2) + (A_1^2 + A_2^2 + A_3^2 + A_4^2) - c^2 d^2 \\
-  H(g_x^{X_n} g_y^{Y_n} g_z^{Z_n} g^{R} s_U^{c} ||
+  F_d = ((\tilde X_n + c x_l)^2 + (\tilde Y_n + c y_l)^2 + (\tilde Z_n + c z_l)^2) + (\tilde A_1^2 + \tilde A_2^2 + \tilde A_3^2 + \tilde A_4^2) - c^2 d^2 \\
+  H(g_x^{\tilde X_n} g_y^{\tilde Y_n} g_z^{\tilde Z_n} g^{\tilde R} s_U^{c} ||
     s_a ||
-    g^{R_a} (\prod_{j=1}^4 h_j^{A_j}) s_a^{c} ||
+    g^{\tilde R_a} (\prod_{j=1}^4 h_j^{\tilde A_j}) s_a^{c} ||
     b_1 ||
-    g^{F_d} g_r^{R_d} b_1^c ||
+    g^{F_d} g_r^{\tilde R_d} b_1^c ||
     s_U ||
     pubp)
   = c
