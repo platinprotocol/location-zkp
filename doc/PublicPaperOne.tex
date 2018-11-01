@@ -2,6 +2,7 @@
 % \documentclass{llncs}
 \usepackage{amsmath,amsfonts,url,graphicx,xcolor}
 % \graphicspath{ {./images/} }
+\usepackage{hyperref}
 
 \begin{document}
 \definecolor{yellow}{HTML}{FFFBEB}
@@ -210,7 +211,10 @@ Verifier produces $F_d$ and then re-produces the challenge as follows
 
 \section{Notes and Decisions}
 
-Notes and decisions capture issues related to zero knowledge proofs of location and are presented in no particular order. Some of the topics discussed relate to our general approach to zero knowledge proofs, and do not directly reflect the equations or protocols above. The contents of notes and decisions may be integrated with the main body of the paper in future. 
+Notes and decisions capture issues related to zero knowledge proofs of location and are presented in no particular order.
+Some of the topics discussed relate to our general approach to zero knowledge proofs, and do not directly reflect the equations or protocols above.
+The contents of notes and decisions may be integrated with the main body of the paper in future. 
+
 
 \subsection{Some Definitions}
 \label{sect-definitions}
@@ -224,16 +228,24 @@ and some threshold $d$ (all integers):
 \end{gather}
 We rely on 4-squares Lagrange theorem to prove equality statement~\cite{Lipmaa03}.
 Proofs for integer relations are possible in hidden group order setup.
+Our proof system is an extension of Schnorr protocol~\cite{Schnorr91}
+with verification relation quadratic in challenge of Verifier.
+Our interactive proof is shown on Figure~\ref{ip_fig}
+and non-interactive variant on Figure~\ref{ni_fig}.
+With our engineering community in mind, we do not focus on definitions like
+proof of knowledge~\cite{BellarePoK}
+and zero knowledge~\cite{Goldwasser85,GMW},
+and just state extractor and simulator algorithms exist for the interactive version.
 
 \subsection{Proof Setup}
 
 Let $g$ be a generator of a proper group of a hidden order,
 and $h$ be a group element (Pedersen commitment scheme).
 We use multiplicative group of invertible residue classes modulo a composite $n$ such that
-$n=pq$, $p=2p'+1$, $q=2q'+1$ and $p, q, p', q'$ primes~\cite{Idemix}.
+$n=pq$, $p=2 k_p p'+1$, $q=2 k_q q'+1$ and $p, q, p', q'$ primes~\cite{Idemix}.
 
 \subsection{Representation-Based Commitment}
-We commit to node location with a Pedersen-like scheme~\cite{BrandsPKIbook}
+We commit to node location with a Pedersen-like scheme~\cite{PedersenCommit,BrandsPKIbook}
 \begin{gather}
 \label{cmt-up-cp}
   s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r}
