@@ -207,7 +207,8 @@ Verifier produces $F_d$ and then re-produces the challenge as follows
 \label{ni_fig}
 \end{figure}
 
-1. Statement of the problem.
+\section{Statement of the problem}
+
 Let     ,      be two points on the plane or in the space.
 One of these points,     , is some reference point: well-known landmark, or monument, or market, or other place of interest.
 It’s location is available to all.
@@ -227,10 +228,12 @@ Also we assume that Alice and Bob both trust this device: Alice trusts that it�
 We also assume that only Bob can activate the device (for example, the device checks fingerprint or so) and that Bob can’t interfere into its work (in particular,
 can’t enter some false data about his location).
 
-2. Definitions and Auxiliary Statements.
+\section{Definitions and Auxiliary Statements}
+
 In this chapter we remind some definitions and statements that are used in zk-location proof.
 
-2.1. Distance between two points.
+\subsection{Distance between two points}  % 2.1
+
 To set a point on the plane we use coordinate plane, or two perpendicular number lines.
 The horizontal line is called x-axis, the vertical one is called y-axis.
 These lines intersect at their zero point, which is called origin (see Fig.2).
@@ -254,7 +257,8 @@ Example.
 Distance between two points,      and      is
     .
 
-2.2. Circle. Points inside circle, points outside circle.
+\subsection{Circle. Points inside circle, points outside circle} % 2.2. 
+
 On the 2-dimentional plane, the circle with the centre O is the set of all points of the plane equidistant from the point O.
 The distance      from the point O to any point on the circle is called radius (see Fig.4).
 Here will be Figure 4.
@@ -300,7 +304,7 @@ The same equivalent conditions may be formulated for the exterior rejoin of the 
     .
 Note that in the article we will use the term “3-dimentional circle” or just “circle” instead of the term “sphere”.
 
-2.3. Connections between Bob’s task and a circle.
+\subsection{Connections between Bob’s task and a circle}  % 2.3. 
 According to the Bob’s task formulated in Chapter 1,
 Bob should prove to Alice that the distance between his location point   
 and some reference point      is less than some given value     :
@@ -311,7 +315,7 @@ Another words, he should prove that the difference
 is positive, i.e.
     .                                    (2)
 
-2.4. Using Lagrange theorem to prove that difference is positive.
+\subsection{Using Lagrange theorem to prove that difference is positive}  % 2.4. 
 As we noted in Chapter 1, Bob doesn’t want to open for Alice his true location.
 So Alice doesn’t know the coordinates      and, consequently, doesn’t know the value
     .
@@ -320,7 +324,7 @@ He may use Lagrange theorem, which states that any positive number may be repres
 Then to prove (2) Bob should prove that there exists such squares     ,     ,     . and      that
     .                     (3)
 
-2.5. Using discrete logarithm to hide the secret information.
+\subsection{Using discrete logarithm to hide the secret information}  % 2.5. 
 Let      and      be prime,     . Then for some (properly chosen) positive      the function
                                                             (4)
 is one-way function, if      and      are unknown.
