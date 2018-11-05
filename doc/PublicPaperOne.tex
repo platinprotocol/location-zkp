@@ -207,6 +207,132 @@ Verifier produces $F_d$ and then re-produces the challenge as follows
 \label{ni_fig}
 \end{figure}
 
+1. Statement of the problem.
+Let  EMBED Equation.DSMT4  ,  EMBED Equation.DSMT4   be two points on the plane or in the space.
+One of these points,  EMBED Equation.DSMT4  , is some reference point: well-known landmark, or monument, or market, or other place of interest.
+It’s location is available to all.
+Some person, named Bob, has the task to visit some point  EMBED Equation.DSMT4  , which is somewhere near the point  EMBED Equation.DSMT4  .
+He may choose the point  EMBED Equation.DSMT4   himself with only one restriction: the distance from the point  EMBED Equation.DSMT4   
+to the point  EMBED Equation.DSMT4   must be smaller than some fixed value (see Fig.1).
+If Bob do the task, he will get some reward from the other person named Alice.
+Here will be Figure 1.
+From the one hand, Bob, for some reasons, doesn’t want to open to Alice his exact location at the point  EMBED Equation.DSMT4  .
+From the other hand, he should persuade Alice that he did visit some place which is close to the point  EMBED Equation.DSMT4  .
+The zero-knowledge protocol from this article is just the instrument designed to solve this contradictionary problem.
+In what follows we should make some additional assumptions.
+We assume that Bob has some device, “black box”, which realizes the next function: when activated, it connects to GPS,
+define coordinates of its real location and send Alice some values, calculated as the values of some function from the coordinate (in 2.5 we will explain how can it be).
+It is important that this function is one-way: given the value of the function, it is impossible to evaluate the correspondent argument of function, i.e. Bob’s real coordinates.
+Also we assume that Alice and Bob both trust this device: Alice trusts that it’s information is true and Bob trusts that information it send doesn’t allow Alice to reveal his location.
+We also assume that only Bob can activate the device (for example, the device checks fingerprint or so) and that Bob can’t interfere into its work (in particular,
+can’t enter some false data about his location).
+
+2. Definitions and Auxiliary Statements.
+In this chapter we remind some definitions and statements that are used in zk-location proof.
+
+2.1. Distance between two points.
+To set a point on the plane we use coordinate plane, or two perpendicular number lines.
+The horizontal line is called x-axis, the vertical one is called y-axis.
+These lines intersect at their zero point, which is called origin (see Fig.2).
+A point in a coordinate plane is named by its ordered pair of the form  EMBED Equation.DSMT4  .
+The first number corresponds to its x-coordinate, the second corresponds to its y-coordinate.
+Here will be Figure 2.
+When given two points,  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4   on the coordinate plane, the distance formula is derived from the Pythagorean theorem, see Fig.3.
+Here will be Figure 3.
+The distance  EMBED Equation.DSMT4   between  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4   on Fig. 3 is the length of the hypotenuse of the right triangle EMBED Equation.DSMT4  .
+The lengths of its cathets are:  EMBED Equation.DSMT4  ;  EMBED Equation.DSMT4  . Then, according to the Pythagorean theorem,
+ EMBED Equation.DSMT4  ,
+or
+ EMBED Equation.DSMT4  .
+Note that  EMBED Equation.DSMT4  , so formulas are symmetrical with respect to  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4  .
+In the 3-dimentional space each point has 3 coordinates.
+Then distance between two points,  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4  , is evaluated using Pythagorean theorem twice:
+ EMBED Equation.DSMT4  ,                                     (1)
+or
+ EMBED Equation.DSMT4  .
+Example.
+Distance between two points,  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4   is
+ EMBED Equation.DSMT4  .
+
+2.2. Circle. Points inside circle, points outside circle.
+On the 2-dimentional plane, the circle with the centre O is the set of all points of the plane equidistant from the point O.
+The distance  EMBED Equation.DSMT4   from the point O to any point on the circle is called radius (see Fig.4).
+Here will be Figure 4.
+Each circle divides the plane into 3 parts.
+One is the set of all points in the interior region of the circle, or the set of points inside the circle.
+The distance from the point O to any point  EMBED Equation.DSMT4   inside the circle is strictly less then the circle’s radius  EMBED Equation.DSMT4  .
+Second one is the set of all points in the exterior region of the circle, or the set of points outside the circle.
+The distance from the point O to any point  EMBED Equation.DSMT4   outside the circle is strictly greater then the circle’s radius  EMBED Equation.DSMT4  .
+And the third one is the set of points on the circle.
+The distance from the point O to any point  EMBED Equation.DSMT4   on the circle is just equal to  EMBED Equation.DSMT4  .
+Let the point O has coordinates  EMBED Equation.DSMT4  .
+Then, according to the definitions of circle and formula (1), the circle consists of all points with such coordinates  EMBED Equation.DSMT4   that
+ EMBED Equation.DSMT4  .
+For any point  EMBED Equation.DSMT4   inside the circle the inequality  EMBED Equation.DSMT4   holds, or
+ EMBED Equation.DSMT4  .
+Analogically, for any point  EMBED Equation.DSMT4   outside the circle the inequality  EMBED Equation.DSMT4   holds, or
+ EMBED Equation.DSMT4  .
+So, the next three conditions are equivalent:
+1) the distance  EMBED Equation.DSMT4   from the point O to the point  EMBED Equation.DSMT4   is less than  EMBED Equation.DSMT4  ;
+2) the point  EMBED Equation.DSMT4   lays inside the circle with the center O and radius  EMBED Equation.DSMT4  ;
+3) the inequality holds:
+ EMBED Equation.DSMT4  .
+The same equivalent conditions may be formulated for the exterior rejoin of the circle:
+1) the distance  EMBED Equation.DSMT4   from the point O to the point  EMBED Equation.DSMT4   is greater than  EMBED Equation.DSMT4  ;
+2) the point  EMBED Equation.DSMT4   lays outside the circle with the center O and radius  EMBED Equation.DSMT4  ;
+3) the inequality holds:
+ EMBED Equation.DSMT4  .
+
+The 3-dimentional analog of circle is called sphere. Like a circle in 2-dimentional space,
+a sphere is defined as the set of all points that are equidistant from some point  EMBED Equation.DSMT4  , which is called the center of the sphere.
+The distance from the point O to any point  EMBED Equation.DSMT4   on the sphere is called the radius of the sphere.
+Each sphere also divides the 3-dimentional space into 3 parts: interior region of the sphere, exterior region of the sphere, and the set of points on the sphere.
+The properties of these three parts are very similar to the properties of the correspondent parts in the case of plane.
+In particular, the next three statements are equivalent:
+1) the distance  EMBED Equation.DSMT4   from the point O to the point  EMBED Equation.DSMT4   is less than  EMBED Equation.DSMT4  ;
+2) the point  EMBED Equation.DSMT4   lays inside the sphere with the center O and radius  EMBED Equation.DSMT4  ;
+3) the inequality holds:
+ EMBED Equation.DSMT4  .
+The same equivalent conditions may be formulated for the exterior rejoin of the sphere:
+1) the distance  EMBED Equation.DSMT4   from the point O to the point  EMBED Equation.DSMT4   is greater than  EMBED Equation.DSMT4  ;
+2) the point  EMBED Equation.DSMT4   lays outside the sphere with the center O and radius  EMBED Equation.DSMT4  ;
+3) the inequality holds:
+ EMBED Equation.DSMT4  .
+Note that in the article we will use the term “3-dimentional circle” or just “circle” instead of the term “sphere”.
+
+2.3. Connections between Bob’s task and a circle.
+According to the Bob’s task formulated in Chapter 1,
+Bob should prove to Alice that the distance between his location point  EMBED Equation.DSMT4
+and some reference point  EMBED Equation.DSMT4   is less than some given value  EMBED Equation.DSMT4  :
+ EMBED Equation.DSMT4  .
+This is the same as his location point  EMBED Equation.DSMT4   is inside the circle with the center O and radius  EMBED Equation.DSMT4  .
+Another words, he should prove that the difference
+ EMBED Equation.DSMT4  
+is positive, i.e.
+ EMBED Equation.DSMT4  .                                    (2)
+
+2.4. Using Lagrange theorem to prove that difference is positive.
+As we noted in Chapter 1, Bob doesn’t want to open for Alice his true location.
+So Alice doesn’t know the coordinates  EMBED Equation.DSMT4   and, consequently, doesn’t know the value
+ EMBED Equation.DSMT4  .
+Then, how can Bob prove that the unknown to Alice value is positive?
+He may use Lagrange theorem, which states that any positive number may be represented as the sum of four squares.
+Then to prove (2) Bob should prove that there exists such squares  EMBED Equation.DSMT4  ,  EMBED Equation.DSMT4  ,  EMBED Equation.DSMT4  . and  EMBED Equation.DSMT4   that
+ EMBED Equation.DSMT4  .                     (3)
+
+2.5. Using discrete logarithm to hide the secret information.
+Let  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4   be prime,  EMBED Equation.DSMT4  . Then for some (properly chosen) positive  EMBED Equation.DSMT4   the function
+ EMBED Equation.DSMT4                                                          (4)
+is one-way function, if  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4   are unknown.
+It means that if Alice knows  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4  , but doesn’t know  EMBED Equation.DSMT4   and  EMBED Equation.DSMT4  ,
+she can’t reveal the value  EMBED Equation.DSMT4   from the value  EMBED Equation.DSMT4  .
+We may use such one-way function, for example, in device, which Bob uses to report Alice information about his location.
+The simplest way to do it is to report Alice values  EMBED Equation.DSMT4  ,  EMBED Equation.DSMT4  , and  EMBED Equation.DSMT4   instead of coordinates  EMBED Equation.DSMT4  ,
+EMBED Equation.DSMT4  , and  EMBED Equation.DSMT4  .
+Next, we can use such function (4) to rewrite the equality (3) in the form
+ EMBED Equation.DSMT4  ,                                    (5)
+which doesn’t allow Alice to reveal secret information, and prove her (5) instead of (4).
+Note that zk-proof of location in the article uses more complicated approach, but the main idea is the same.
 
 
 \section{Notes and Decisions}
