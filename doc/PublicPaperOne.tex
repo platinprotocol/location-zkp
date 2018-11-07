@@ -62,16 +62,16 @@ The mathematical commitment is verified by applying the zero knowledge protocol 
 
 \section{Statement of the problem}
 
-Let     ,      be two points on the plane or in the space.
-One of these points,     , is some reference point: well-known landmark, or monument, or market, or other place of interest.
+Let $A, B$ be two points on the plane or in the space.
+One of these points, $A$, is some reference point: well-known landmark, or monument, or market, or other place of interest.
 It’s location is available to all.
-Some person, named Bob, has the task to visit some point     , which is somewhere near the point     .
-He may choose the point      himself with only one restriction: the distance from the point      
-to the point      must be smaller than some fixed value (see Fig.1).
+Some person, named Bob, has the task to visit some point $B$, which is somewhere near the point $A$.
+He may choose the point $B$ himself with only one restriction: the distance from the point      
+to the point $A$ must be smaller than some fixed value (see Fig.1).
 If Bob do the task, he will get some reward from the other person named Alice.
 Here will be Figure 1.
-From the one hand, Bob, for some reasons, doesn’t want to open to Alice his exact location at the point     .
-From the other hand, he should persuade Alice that he did visit some place which is close to the point     .
+From the one hand, Bob, for some reasons, doesn’t want to open to Alice his exact location at the point $B$.
+From the other hand, he should persuade Alice that he did visit some place which is close to the point $A$.
 The zero-knowledge protocol from this article is just the instrument designed to solve this contradictionary problem.
 In what follows we should make some additional assumptions.
 We assume that Bob has some device, “black box”, which realizes the next function: when activated, it connects to GPS,
@@ -90,25 +90,36 @@ In this chapter we remind some definitions and statements that are used in zk-lo
 To set a point on the plane we use coordinate plane, or two perpendicular number lines.
 The horizontal line is called x-axis, the vertical one is called y-axis.
 These lines intersect at their zero point, which is called origin (see Fig.2).
-A point in a coordinate plane is named by its ordered pair of the form     .
+A point in a coordinate plane is named by its ordered pair of the form $(x, y)$.
 The first number corresponds to its x-coordinate, the second corresponds to its y-coordinate.
 Here will be Figure 2.
-When given two points,      and      on the coordinate plane, the distance formula is derived from the Pythagorean theorem, see Fig.3.
+When given two points, $A(x_1, y_1)$ and $B(x_2, y_2)$ on the coordinate plane, the distance formula is derived from the Pythagorean theorem, see Fig.3.
 Here will be Figure 3.
-The distance      between      and      on Fig. 3 is the length of the hypotenuse of the right triangle    .
-The lengths of its cathets are:     ;     . Then, according to the Pythagorean theorem,
-    ,
+The distance $AB$ between $A(x_1, y_1)$ and $B(x_2, y_2)$ on Fig. 3 is the length of the hypotenuse of the right triangle $ABC$.
+The lengths of its cathets are: $BC = |x_1 - x_2|$ and $AC = |y_1 - y_2|$.
+ Then, according to the Pythagorean theorem,
+\begin{equation}
+  AB^2 = AC^2 + BC^2 = (x_1 - x_2)^2 + (y_1 - y_2)^2
+\end{equation}
 or
-    .
-Note that     , so formulas are symmetrical with respect to      and     .
+\begin{equation}
+  AB = \sqrt{AC^2 + BC^2} = \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}
+\end{equation}
+Note that $(x - y)^2 = (y - x)^2$, so formulas are symmetrical with respect to $(x_1, y_1)$ and $(x_2, y_2)$.
 In the 3-dimentional space each point has 3 coordinates.
-Then distance between two points,      and     , is evaluated using Pythagorean theorem twice:
-    ,                                     (1)
+Then distance between two points, $A(x_1, y_1, z_1)$ and $A(x_1, y_1, z_1)$, is evaluated using Pythagorean theorem twice:
+\begin{equation}
+  AB^2 = AC^2 + BC^2 = (x_1 - x_2)^2 + (y_1 - y_2)^2 + (z_1 - z_2)^2
+\end{equation}
 or
-    .
+\begin{equation}
+  AB = \sqrt{AC^2 + BC^2} = \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2 + (z_1 - z_2)^2}
+\end{equation}
 Example.
-Distance between two points,      and      is
-    .
+Distance between two points, $A(3, -1, 2)$ and $B(5, 3, -2)$ is
+\begin{equation}
+  AB = \sqrt{(3 - 5)^2 + (-1 - 3)^2 + (2 - (-2))^2} = 6
+\end{equation}
 
 \subsection{Circle. Points inside circle, points outside circle} % 2.2. 
 
@@ -130,67 +141,108 @@ For any point      inside the circle the inequality      holds, or
 Analogically, for any point      outside the circle the inequality      holds, or
     .
 So, the next three conditions are equivalent:
-1) the distance      from the point O to the point      is less than     ;
-2) the point      lays inside the circle with the center O and radius     ;
-3) the inequality holds:
-    .
+\begin{enumerate}
+\item
+the distance $OC$ from the point $O$ to the point $C(x, y)$ is less than~$R$;
+\item
+the point $C(x, y)$ lays inside the circle with the center $O$ and radius~$R$;
+\item
+the inequality holds:
+\begin{equation}
+  (x - x_0)^2 + (y - y_0)^2 + (z - z_0)^2 < R^2
+\end{equation}
+\end{enumerate}
 The same equivalent conditions may be formulated for the exterior rejoin of the circle:
-1) the distance      from the point O to the point      is greater than     ;
-2) the point      lays outside the circle with the center O and radius     ;
-3) the inequality holds:
-    .
-
+\begin{enumerate}
+\item
+the distance $OC$ from the point $O$ to the point $C(x, y)$ is greater than~$R$;
+\item
+the point $C(x, y)$ lays outside the circle with the center $O$ and radius~$R$;
+\item
+the inequality holds:
+\begin{equation}
+  (x - x_0)^2 + (y - y_0)^2 + (z - z_0)^2 > R^2
+\end{equation}
+\end{enumerate}
 The 3-dimentional analog of circle is called sphere. Like a circle in 2-dimentional space,
-a sphere is defined as the set of all points that are equidistant from some point     , which is called the center of the sphere.
-The distance from the point O to any point      on the sphere is called the radius of the sphere.
+a sphere is defined as the set of all points that are equidistant from some point $O(x_0, y_0, z_0)$, which is called the center of the sphere.
+The distance from the point O to any point $A(x, y, z)$ on the sphere is called the radius of the sphere.
 Each sphere also divides the 3-dimentional space into 3 parts: interior region of the sphere, exterior region of the sphere, and the set of points on the sphere.
 The properties of these three parts are very similar to the properties of the correspondent parts in the case of plane.
 In particular, the next three statements are equivalent:
-1) the distance      from the point O to the point      is less than     ;
-2) the point      lays inside the sphere with the center O and radius     ;
-3) the inequality holds:
-    .
+\begin{enumerate}
+\item
+the distance $OC$ from the point $O$ to the point $C(x, y, z)$ is less than~$R$;
+\item
+the point $C(x, y, z)$ lays inside the sphere with the center $O$ and radius~$R$;
+\item
+the inequality holds:
+\begin{equation}
+  (x - x_0)^2 + (y - y_0)^2 + (z - z_0)^2 < R^2
+\end{equation}
+\end{enumerate}
 The same equivalent conditions may be formulated for the exterior rejoin of the sphere:
-1) the distance      from the point O to the point      is greater than     ;
-2) the point      lays outside the sphere with the center O and radius     ;
-3) the inequality holds:
-    .
+\begin{enumerate}
+\item
+the distance $OC$ from the point $O$ to the point $C(x, y, z)$ is greater than~$R$;
+\item
+the point $C(x, y, z)$ lays outside the sphere with the center $O$ and radius~$R$;
+\item
+the inequality holds:
+\begin{equation}
+  (x - x_0)^2 + (y - y_0)^2 + (z - z_0)^2 > R^2
+\end{equation}
+\end{enumerate}
 Note that in the article we will use the term “3-dimentional circle” or just “circle” instead of the term “sphere”.
 
 \subsection{Connections between Bob’s task and a circle}  % 2.3. 
 According to the Bob’s task formulated in Chapter 1,
-Bob should prove to Alice that the distance between his location point   
-and some reference point      is less than some given value     :
-    .
-This is the same as his location point      is inside the circle with the center O and radius     .
+Bob should prove to Alice that the distance between his location point $A(x, y, z)$  
+and some reference point $O(x_0, y_0, z_0)$ is less than some given value~$d$:
+\begin{equation}
+  (x - x_0)^2 + (y - y_0)^2 + (z - z_0)^2 < d
+\end{equation}
+This is the same as his location point $A(x, y, z)$ is inside the circle with the center $O(x_0, y_0, z_0)$ and radius~$R$.
 Another words, he should prove that the difference
-    
+\begin{equation}
+  d^2 - (x - x_0)^2 - (y - y_0)^2 - (z - z_0)^2
+\end{equation}
 is positive, i.e.
-    .                                    (2)
+\begin{equation}
+  d^2 - (x - x_0)^2 - (y - y_0)^2 - (z - z_0)^2 > 0
+\end{equation}
 
 \subsection{Using Lagrange theorem to prove that difference is positive}  % 2.4. 
 As we noted in Chapter 1, Bob doesn’t want to open for Alice his true location.
-So Alice doesn’t know the coordinates      and, consequently, doesn’t know the value
-    .
+So Alice doesn’t know the coordinates $x, y, z$ and, consequently, doesn’t know the value
+\begin{equation}
+  d^2 - (x - x_0)^2 - (y - y_0)^2 - (z - z_0)^2
+\end{equation}
 Then, how can Bob prove that the unknown to Alice value is positive?
 He may use Lagrange theorem, which states that any positive number may be represented as the sum of four squares.
-Then to prove (2) Bob should prove that there exists such squares     ,     ,     . and      that
-    .                     (3)
+Then to prove (2) Bob should prove that there exists such squares $a_1^2, a_2^2, a_3^2$ and $a_4^2$ that
+\begin{equation}
+  d^2 - (x - x_0)^2 - (y - y_0)^2 - (z - z_0)^2 = a_1^2 + a_2^2 + a_3^2 + a_4^2
+\end{equation}
 
 \subsection{Using discrete logarithm to hide the secret information}  % 2.5. 
-Let      and      be prime,     . Then for some (properly chosen) positive      the function
-                                                            (4)
-is one-way function, if      and      are unknown.
-It means that if Alice knows      and     , but doesn’t know      and     ,
-she can’t reveal the value      from the value     .
+Let $p$ and $q$ be primes, $n= pq$.
+Then for some (properly chosen) positive $g < n$ the function
+\begin{equation}
+  f(u) = g^u \pmod{n}
+\end{equation}
+is one-way function over integers domain, if $p$ and $q$ are unknown.
+It means that if Alice knows $q$ and $n$, but doesn’t know $p$ and $q$,
+she can’t find the value $u$ from the value $f(u)$.
 We may use such one-way function, for example, in device, which Bob uses to report Alice information about his location.
-The simplest way to do it is to report Alice values     ,     , and      instead of coordinates     ,
-   , and     .
+The simplest way to do it is to report Alice values $g^x \pmod{n}$, $g^y \pmod{n}$, and $g^z \pmod{n}$
+instead of coordinates $x$, $y$, and $z$.
 Next, we can use such function (4) to rewrite the equality (3) in the form
-    ,                                    (5)
+\begin{equation}
+  g^{d^2 - (x - x_0)^2 - (y - y_0)^2 - (z - z_0)^2} = g^{a_1^2 + a_2^2 + a_3^2 + a_4^2}
+\end{equation}
 which doesn’t allow Alice to reveal secret information, and prove her (5) instead of (4).
 Note that zk-proof of location in the article uses more complicated approach, but the main idea is the same.
-
 
 \section{Notes and Decisions}
 
