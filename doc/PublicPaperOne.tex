@@ -67,9 +67,17 @@ One of these points, $A$, is some reference point: well-known landmark, or monum
 It’s location is available to all.
 Some person, named Bob, has the task to visit some point $B$, which is somewhere near the point $A$.
 He may choose the point $B$ himself with only one restriction: the distance from the point      
-to the point $A$ must be smaller than some fixed value (see Fig.1).
+to the point $A$ must be smaller than some fixed value (see Fig.~\ref{fig-1}).
 If Bob do the task, he will get some reward from the other person named Alice.
-Here will be Figure 1.
+% Here will be Figure 1.
+\begin{figure}
+  \centering
+  \def\svgwidth{\columnwidth}
+%  \input{img1.pdf_tex}
+\caption{The distance between $A$ and $B$ is equal to $l$, $l < d$.}
+\label{fig-1}
+\end{figure}
+%
 From the one hand, Bob, for some reasons, doesn’t want to open to Alice his exact location at the point $B$.
 From the other hand, he should persuade Alice that he did visit some place which is close to the point $A$.
 The zero-knowledge protocol from this article is just the instrument designed to solve this contradictionary problem.
@@ -89,13 +97,29 @@ In this chapter we remind some definitions and statements that are used in zk-lo
 
 To set a point on the plane we use coordinate plane, or two perpendicular number lines.
 The horizontal line is called x-axis, the vertical one is called y-axis.
-These lines intersect at their zero point, which is called origin (see Fig.2).
+These lines intersect at their zero point, which is called origin (see Fig.~\ref{fig-2}).
 A point in a coordinate plane is named by its ordered pair of the form $(x, y)$.
 The first number corresponds to its x-coordinate, the second corresponds to its y-coordinate.
-Here will be Figure 2.
-When given two points, $A(x_1, y_1)$ and $B(x_2, y_2)$ on the coordinate plane, the distance formula is derived from the Pythagorean theorem, see Fig.3.
-Here will be Figure 3.
-The distance $AB$ between $A(x_1, y_1)$ and $B(x_2, y_2)$ on Fig. 3 is the length of the hypotenuse of the right triangle $ABC$.
+% Here will be Figure 2.
+\begin{figure}
+  \centering
+  \def\svgwidth{\columnwidth}
+  \input{img3_is_2.pdf_tex}
+\caption{Points on the coordinate plane.}
+\label{fig-2}
+\end{figure}
+%
+When given two points, $A(x_1, y_1)$ and $B(x_2, y_2)$ on the coordinate plane, the distance formula is derived from the Pythagorean theorem, see Fig.~\ref{fig-3}.
+%Here will be Figure 3.
+\begin{figure}
+  \centering
+  \def\svgwidth{\columnwidth}
+  \input{img4_is_3.pdf_tex}
+\caption{Distance between $A$ and $B$ as the length of the hypotenuse.}
+\label{fig-3}
+\end{figure}
+%
+The distance $AB$ between $A(x_1, y_1)$ and $B(x_2, y_2)$ on Fig.~\ref{fig-3} is the length of the hypotenuse of the right triangle $ABC$.
 The lengths of its cathets are: $BC = |x_1 - x_2|$ and $AC = |y_1 - y_2|$.
  Then, according to the Pythagorean theorem,
 \begin{equation}
@@ -123,23 +147,37 @@ Distance between two points, $A(3, -1, 2)$ and $B(5, 3, -2)$ is
 
 \subsection{Circle. Points inside circle, points outside circle} % 2.2. 
 
-On the 2-dimentional plane, the circle with the centre O is the set of all points of the plane equidistant from the point O.
-The distance      from the point O to any point on the circle is called radius (see Fig.4).
-Here will be Figure 4.
+On the 2-dimentional plane, the circle with the centre $O$ is the set of all points of the plane equidistant from the point $O$.
+The distance $R$ from the point $O$ to any point on the circle is called radius (see Fig.~\ref{fig-1}).
+%Here will be Figure 4.
+\begin{figure}
+  \centering
+  \def\svgwidth{\columnwidth}
+%  \input{img4.pdf_tex}
+\caption{Points inside, outside, and on the circle.}
+\label{fig-4}
+\end{figure}
+%
 Each circle divides the plane into 3 parts.
 One is the set of all points in the interior region of the circle, or the set of points inside the circle.
-The distance from the point O to any point      inside the circle is strictly less then the circle’s radius     .
+The distance from the point $O$ to any point $C$ inside the circle is strictly less then the circle’s radius     .
 Second one is the set of all points in the exterior region of the circle, or the set of points outside the circle.
-The distance from the point O to any point      outside the circle is strictly greater then the circle’s radius     .
+The distance from the point $O$ to any point $D$ outside the circle is strictly greater then the circle’s radius $R$.
 And the third one is the set of points on the circle.
-The distance from the point O to any point      on the circle is just equal to     .
-Let the point O has coordinates     .
-Then, according to the definitions of circle and formula (1), the circle consists of all points with such coordinates      that
-    .
-For any point      inside the circle the inequality      holds, or
-    .
-Analogically, for any point      outside the circle the inequality      holds, or
-    .
+The distance from the point $O$ to any point $A$ on the circle is just equal to $R$.
+Let the point $O$ has coordinates $(x_0, y_0)$.
+Then, according to the definitions of circle and formula (1), the circle consists of all points with such coordinates $(x, y)$ that
+\begin{equation}
+  (x - x_0)^2 + (y - y_0)^2 = R^2
+\end{equation}
+For any point $C(x_1, y_1)$ inside the circle the inequality $OC < R$ holds, or
+\begin{equation}
+  (x_1 - x_0)^2 + (y_1 - y_0)^2 < R^2
+\end{equation}
+Analogically, for any point $D(x_2, y_2)$ outside the circle the inequality $OD > R$ holds, or
+\begin{equation}
+  (x_2 - x_0)^2 + (y_2 - y_0)^2 > R^2
+\end{equation}
 So, the next three conditions are equivalent:
 \begin{enumerate}
 \item
@@ -224,6 +262,8 @@ Then to prove (2) Bob should prove that there exists such squares $a_1^2, a_2^2,
 \begin{equation}
   d^2 - (x - x_0)^2 - (y - y_0)^2 - (z - z_0)^2 = a_1^2 + a_2^2 + a_3^2 + a_4^2
 \end{equation}
+This criteria is strict: such a 4-tuple of integers exists for any non-negative distance difference,
+and no tuple exist for the negative difference (for a point outside the range).
 
 \subsection{Using discrete logarithm to hide the secret information}  % 2.5. 
 Let $p$ and $q$ be primes, $n= pq$.
@@ -233,7 +273,7 @@ Then for some (properly chosen) positive $g < n$ the function
 \end{equation}
 is one-way function over integers domain, if $p$ and $q$ are unknown.
 It means that if Alice knows $q$ and $n$, but doesn’t know $p$ and $q$,
-she can’t find the value $u$ from the value $f(u)$.
+she can’t find the integer $u$ from the value $f(u)$.
 We may use such one-way function, for example, in device, which Bob uses to report Alice information about his location.
 The simplest way to do it is to report Alice values $g^x \pmod{n}$, $g^y \pmod{n}$, and $g^z \pmod{n}$
 instead of coordinates $x$, $y$, and $z$.
@@ -501,3 +541,7 @@ Verifier is testing that polynomial $f_{KV}(v)$ is of degree at most $2K-1$, not
 
 %\appendix
 \end{document}
+
+trusted hardware
+argument
+probability of false positive
