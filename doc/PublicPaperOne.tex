@@ -65,17 +65,19 @@ The mathematical commitment is verified by applying the zero knowledge protocol 
 We use passwords all the time: to read mail, to access websites and accounts on desktop.
 It looks simple: just tell me our secret, and I will string-compare it with my copy.
 Sure nobody can see that secret in-transit, either over the net, or over USB cable, right?
-Well, we can switch to public/private keys, and ssh is there available to most of devices ready and free to use.
+Well, we can switch to public/private keys, and ssh is there available for many devices, free to use.
 Electronic signatures give us the means to verify a statement about a hidden data (private key)
 with public information, as well as create a ciphertext only having a public key.
 It is still not perfect yet. Sometimes traffic analysis (who talks to whom) is a secret itself.
-For example, a manager having records an employer emails to human resorces of a competitor.
+For example, a manager having records an employee emails to human resorces of a competitor.
 With this never-ending cat-and-mouse game, a concept of zero knowledge become in demand,
 and it means deniability.
 In computer science, zero knowledge is formalized as existence of a simulator algorithm,
 that would produce fake records fast/easy enough,
 that are indistinguishable from records of communication with a party really holding his secrets, the Prover.
-A fascinating writeup~\cite{Quisquater89} is around explaining it both easy and strict manner.
+A fascinating writeup~\cite{Quisquater89} is around explaining it in both easy and strict manner.
+Proof systems were developed last decade for complex statements, not just having a proper private key.
+In particular, we verify that distance to a secret point is smaller than a threshold.
 
 \section{Statement of the problem}
 
