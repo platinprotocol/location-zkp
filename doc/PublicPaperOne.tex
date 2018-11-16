@@ -67,15 +67,19 @@ It looks simple: just tell me our secret, and I will string-compare it with my c
 Sure nobody can see that secret in-transit, either over the net, or over USB cable, right?
 Well, we can switch to public/private keys, and ssh is there available for many devices, free to use.
 Electronic signatures give us the means to verify a statement about a hidden data (private key)
-with public information, as well as create a ciphertext only having a public key.
-It is still not perfect yet. Sometimes traffic analysis (who talks to whom) is a secret itself.
-For example, a manager having records an employee emails to human resorces of a competitor.
-With this never-ending cat-and-mouse game, a concept of zero knowledge become in demand,
-and it means deniability.
+having public information only. %, as well as create a ciphertext only having a public key.
+This is much better than passwords, but still not perfect yet.
+Sometimes traffic analysis (who talks to whom) is a secret itself.
+For example, a manager having a record of an employee email to human resorces of a competitor.
+Zero knowledge property would mean deniability here.
+
 In computer science, zero knowledge is formalized as existence of a simulator algorithm,
 that would produce fake records fast/easy enough,
 that are indistinguishable from records of communication with a party really holding his secrets, the Prover.
 A fascinating writeup~\cite{Quisquater89} is around explaining it in both easy and strict manner.
+Please note the real goal of Mick Ali character was to take the case to court,
+and have it decided that records of passing the cave are indistinguishabe.
+
 Proof systems were developed last decade for complex statements, not just having a proper private key.
 In particular, we verify that distance to a secret point is smaller than a threshold.
 
@@ -334,22 +338,50 @@ proof of knowledge~\cite{BellarePoK}
 and zero knowledge~\cite{Goldwasser85,GMW},
 and just state extractor and simulator algorithms exist for the interactive version.
 
-\subsection{Proof Setup}
-
-Let $g$ be a generator of a proper group of a hidden order,
-and $h$ be a group element (Pedersen commitment scheme).
-We use multiplicative group of invertible residue classes modulo a composite $n$ such that
-$n=pq$, $p=2 k_p p'+1$, $q=2 k_q q'+1$ and $p, q, p', q'$ primes~\cite{Idemix}.
-
 \subsection{Representation-Based Commitment}
+
+Commitment scheme is a 3-tuple of algorithms: setup, commit and open.
+Binding and hiding are properties of the scheme.
+Binding means it is infeasible to produce an instance of commitment with alternative input data.
+Hiding means it is infeasible to learn something about input data from an instance only.
+
 We commit to node location with a Pedersen-like scheme~\cite{PedersenCommit,BrandsPKIbook}
 \begin{gather}
 \label{cmt-up-cp}
   s_U = g_x^{x_n} g_y^{y_n} g_z^{z_n} g^{r}
 \end{gather}
 where $g_x, g_y, g_z$ are group elements, and $r$ is a random.
-This scheme admits a proof of knowledge with the same responses required form threshold location verification.
-This scheme can be extended with additional components. % like set of wireless station% name-power pairs.
+
+From binding it follows that Prover can not open an instance with another location,
+and hiding means Verifier can not learn what is location committed.
+This scheme has an additional property of being homomorphic
+and admits a proof of knowledge of location.
+
+% with the same responses required form threshold location verification.
+% This scheme can be extended with additional components. % like set of wireless station% name-power pairs.
+
+\subsection{Schnorr protocol}
+
+Proof of knowledge of the data committed introduced by Schnorr~\cite{}
+is the major building block of out design.
+Prover and Verifier send 3 messages and then Verifier decides whether to accept the proof.
+Last message of the protocol, response of the Prover, can be considered as
+a linear polynomial evaluated at a random point chosen by Verifier as his challenge.
+For the original protocol, Verifier tests validity of a relation with this response.
+
+With distance relation~\eqref{} as our goal, we design appropriate additional verification equation
+for our protocol.
+Basically, we substitute responses of Prover in place of coordinates committed.
+This equation could be considered a quadratic polynomial in challenge of Verifier.
+
+\subsection{Proof Setup}
+
+We choose $g$ to be a generator of a proper group of a hidden order.
+%and $h$ be an group element (Pedersen commitment scheme).
+We use multiplicative group of invertible residue classes modulo a composite $n$~\cite{Idemix}
+such that $n=pq$, $p = 2 p' k_p + 1$, $q = 2 q' k_q + 1$ and $p, q, p', q'$ primes.
+We then choose group elements of order $p' q'$ to commit to location and intermediate proof components.
+
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[!htb]
