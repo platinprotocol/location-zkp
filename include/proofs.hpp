@@ -107,6 +107,14 @@ public:
   CryptoPP::Integer A[4], X_n, Y_n, Z_n, R, R_a, R_d;
 };
 
+typedef long sq4[4];
+
+typedef struct p4sq_ {
+  long prime;
+  sq4 sq;
+} p4sq;
+
+
 void init_parameters(Parameters &parm);
 void ni_proof_initial(InitialCommitments &ic, PrivateInfo &privi, ProofPrivate &privpf, const PublicInfo &pubi, const Parameters &pp);
 CryptoPP::Integer ni_proof_challenge(const InitialCommitments &ic, const CryptoPP::Integer &s_U, const std::string aux);
@@ -131,3 +139,5 @@ void ni_proof_serialize(std::string &proof, const InitialCommitments &ic, const 
 void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, CryptoPP::Integer &c, Responses &resp, CryptoPP::Integer &s_U, CryptoPP::Integer &d2);
 
 std::string pubcoords(const double xl, const double yl, const double zl, const double d);
+
+void pa4decomposition(long inp, long *a1, long *a2, long *a3, long *a4);
