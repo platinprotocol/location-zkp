@@ -11,7 +11,7 @@ void prime4table() {
   long k, a1, a2, a3, a4;
 
   for(k=0; k<PSZ; k++) {
-    pa4decomposition(primesl[k], &a1, &a2, &a3, &a4);
+    pa4decomposition(primesl[k], a1, a2, a3, a4);
     std::cout << "  {" << primesl[k] << ", {" << a1 << ", " <<  a2 << ", " <<  a3 << ", " <<  a4 << "}}," << std::endl;
   }
 }

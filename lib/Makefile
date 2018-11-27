@@ -1,4 +1,4 @@
-CFLAGS = -g2 -O3 -fPIC -pthread -pipe
+CFLAGS = -g2 -O0 -fPIC -pthread -pipe
 CRYPTOPP = /Users/vfedyukovych/platin/src
 CFLAGS += -I$(CRYPTOPP)
 LIBS = -L$(CRYPTOPP)/cryptopp -lcryptopp
@@ -7,6 +7,7 @@ CFLAGS += -I../include
 
 LIB= libproofs.so
 SRCS= round.cpp qt.cpp gi.cpp commitments.cpp parameters.cpp niproof.cpp lagrange.cpp geocoord.cpp
+SRCS+= eulerid.cpp
 OBJS= $(SRCS:.cpp=.o)
 
 all:	$(LIB)
@@ -16,6 +17,14 @@ test:	test-niproof test-ggcd test-qgcrd
 test-niproof:	test-niproof.o $(LIB)
 
 test-niproof.o:	test-niproof.cpp
+
+
+test-eulerid.o:	test-eulerid.cpp
+
+test-eulerid:	test-eulerid.o  $(LIB)
+
+primes_decomposition.inc:	test-eulerid
+	./test-eulerid > primes_decomposition.inc
 
 test-ggcd:	test-ggcd.o $(LIB)
 
