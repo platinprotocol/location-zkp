@@ -141,3 +141,4 @@ void ni_proof_deserialize(const std::string &proof, InitialCommitments &ic, Cryp
 std::string pubcoords(const double xl, const double yl, const double zl, const double d);
 
 void pa4decomposition(long inp, long &a1, long &a2, long &a3, long &a4);
+void eulerid(long (&ar)[4], long b[4]);

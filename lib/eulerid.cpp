@@ -12,16 +12,13 @@
 
 #include "proofs.hpp"
 
-void eulerid(long a[4], long b[4], long *c[4]) {
-  *c[0] = a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3];
-  *c[1] = a[0] * b[1] + a[1] * b[0] + a[2] * b[2] - a[3] * b[2];
-  *c[2] = a[0] * b[2] - a[1] * b[3] + a[2] * b[0] + a[3] * b[1];
-  *c[3] = a[0] * b[3] + a[1] * b[2] - a[2] * b[1] + a[3] * b[0];
-}
-
-void upd_decomposition(long &a1, long &a2, long &a3, long &a4, long aprime) {
-  long a[4], b[4], *c[4];
-  eulerid(a, b, c);
+void eulerid(long (&ar)[4], long b[4]) {
+  long a[4];
+  a[0] = ar[0]; a[1] = ar[1]; a[2] = ar[2]; a[3] = ar[3];
+  ar[0] = a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3];
+  ar[1] = a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2];
+  ar[2] = a[0] * b[2] - a[1] * b[3] + a[2] * b[0] + a[3] * b[1];
+  ar[3] = a[0] * b[3] + a[1] * b[2] - a[2] * b[1] + a[3] * b[0];
 }
 
 void pa4decomposition(long inp, long &a1, long &a2, long &a3, long &a4) {

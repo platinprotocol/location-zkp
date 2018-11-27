@@ -21,10 +21,12 @@ test-niproof.o:	test-niproof.cpp
 
 test-eulerid.o:	test-eulerid.cpp
 
-test-eulerid:	test-eulerid.o  $(LIB)
+test-eulerid:	test-eulerid.o
 
 primes_decomposition.inc:	test-eulerid
 	./test-eulerid > primes_decomposition.inc
+
+lagrange.o:	lagrange.cpp primes_decomposition.inc
 
 test-ggcd:	test-ggcd.o $(LIB)
 
