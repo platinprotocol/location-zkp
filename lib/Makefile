@@ -19,7 +19,7 @@ test-niproof:	test-niproof.o $(LIB)
 test-niproof.o:	test-niproof.cpp
 
 
-test-eulerid.o:	test-eulerid.cpp
+test-eulerid.o:	test-eulerid.cpp primes_lst.hpp
 
 test-eulerid:	test-eulerid.o
 
