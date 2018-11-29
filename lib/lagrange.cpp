@@ -76,7 +76,7 @@ long get_airdrop_radius(PublicInfo &pubi, PrivateInfo &privi) {
 	    << " " << full_a[3]
 	    << std::endl;
 
-  privi.a[0] = full_a[0]; privi.a[1] = full_a[1]; privi.a[2] = full_a[2]; privi.a[3] = full_a[3];
+  privi.a[0] = abs(full_a[0]); privi.a[1] = abs(full_a[1]); privi.a[2] = abs(full_a[2]); privi.a[3] = abs(full_a[3]);
 #else
   for(int j=0; j<4; j++) {  // calculate_A1_A2_A3_A4()
     approx = sqrt(diff_dist); // approximation by rounding while assigning to integer
